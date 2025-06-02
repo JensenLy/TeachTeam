@@ -10,12 +10,16 @@ const[lastName, setLastName] = useState<string>("")
 const[email, setEmail] = useState<string>("")
 const[password, setPassword] = useState<string>("")
 const[confirmPassword, setConfirmPassword] = useState<string>("")
-const[isTypingPassword, setIsTypingPassword] = useState<boolean>(false)
 const[userRole, setUserRole] = useState<string>("")
 const[successfullySubmittedForm, setSuccessfullySubmittedForm] = useState<boolean>(false)
 
 const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    if (password !== confirmPassword) {
+      alert("Passwords do not match. Please try again.");
+      return;
+    }
 
     const userSignUpData: UserData = {
       firstName: firstName,
@@ -86,10 +90,7 @@ else{
             type="password" 
             name="createPassword" 
             minLength={8}
-            onChange={(e) => {
-              setPassword(e.target.value)
-              setIsTypingPassword(e.target.value.length > 0 ? true : false) 
-            }}
+            onChange={(e) => setPassword(e.target.value)}
             required></input>
 
             <input placeholder="Confirm Password" className="border-2 rounded-md border-blue-600 text-lg p-1 w-full"

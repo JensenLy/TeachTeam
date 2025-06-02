@@ -115,7 +115,7 @@ export default function Tutor() {
     }
 
     // swap (or switch or whatever) between the jobs card and the form 
-    const swapScreen = (e: any, programCode?: string) => {    
+    const swapScreen = (e: React.MouseEvent<HTMLButtonElement>, programCode?: string) => {    
         e.preventDefault(); //same as above, prevent refreshing 
         if(typeof programCode !== "undefined"){ //set the program code for the form if there's none 
             setcourseCodeAppliedTo(programCode)
