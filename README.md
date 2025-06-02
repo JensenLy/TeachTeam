@@ -1,5 +1,5 @@
-# s4107070-s3977367-A1
-Full Stack Development Assignment 1 by Christian Nabati(S4107070) and Kien Hung Ly(S3977367)
+# s4107070-s3977367-a2
+Full Stack Development Assignment 2 by Christian Nabati(S4107070) and Kien Hung Ly(S3977367)
 
 Github Repositary Link:
 https://github.com/rmit-fsd-2025-s1/s4107070-s3977367-A1
