@@ -1,63 +1,13 @@
-    import React, { useEffect } from "react";
+    import React from "react";
     import Image from "next/image";
     import Link from "next/link";
     import { useState } from "react"
     import { useRouter } from "next/router"
     import { useContext } from "react";
     import { loginContext, LoginContextType } from "@/contexts/LoginContext";
-    import { Users } from "../types/users";
     import { userApi } from "../services/api";
 
     // a list of users which are 3 tutors and 3 lecturers
-    const userData: Users[] = [
-
-        {
-            firstName: "John",
-            lastName: "Smith",
-            email: "Johnsmith@gmail.com",
-            password: "John12345@",
-            userRole: "Tutor"
-        },  
-    
-        {
-            firstName: "Noah",
-            lastName: "Smith",
-            email: "Noahsmith@gmail.com",
-            password: "Rooh3003@",
-            userRole: "Lecturer"
-        },
-        {
-            firstName: "Kyle",
-            lastName: "Smith",
-            email: "Kylesmith@gmail.com",
-            password: "Kyle12345@",
-            userRole: "Tutor"
-        },
-    
-        {
-            firstName: "Daniel",
-            lastName: "Jan",
-            email: "Danieljan@gmail.com",
-            password: "Daniel12345@",
-            userRole: "Lecturer"
-        },
-    
-        {
-            firstName: "Kate",
-            lastName: "blane",
-            email: "Kateblane@gmail.com",
-            password: "Kate12345@",
-            userRole: "Tutor"
-        },
-    
-        {
-            firstName: "Messi",
-            lastName: "James",
-            email: "Messijames@gmail.com",
-            password: "Messi12345@",
-            userRole: "Lecturer"
-        }
-    ];
 
 export default function SignIn(){
 const[email, setEmail] = useState<string>("")
@@ -65,7 +15,6 @@ const[password, setPassword] = useState<string>("")
 const[loginMessage, setLoginMessage] = useState<string>("")
 const{setIsLoggedIn, setFirstNameLogedIn, setEmailLogedIn, setLastNameLogedIn, setUserRole} = useContext(loginContext) as LoginContextType;
 const router = useRouter()
-const [error, setError] = useState<string | null>(null);
 const [user, setUser] = useState({
     firstName: "",
     lastName: "",
@@ -74,9 +23,7 @@ const [user, setUser] = useState({
     role: "",
   });
 
-    useEffect(()=>{
-        localStorage.setItem("userData", JSON.stringify(userData))
-    },[]);
+
 
     const handleFindUser = async (e: React.FormEvent, email:string) => {
         e.preventDefault();
@@ -84,8 +31,8 @@ const [user, setUser] = useState({
             const data = await userApi.getUserByEmail(email);
             setUser(data);
         } catch (err) {
-            setError("email failed");
             console.log(err);
+            setUser({firstName: "", lastName: "", email: "", password:"", role: ""})
         }
     };
 
@@ -104,9 +51,8 @@ const [user, setUser] = useState({
             return;
         }
         
-        if(error){
+        if(!user.email){
             setLoginMessage("Email not found ❌");
-            setError(null)
             return;
         }
         
@@ -117,7 +63,7 @@ const [user, setUser] = useState({
             setEmailLogedIn(email)
             setUserRole(user.role)
 
-            if(user.role === "Tutor"){
+            if(user.role === "tutor"){
                 setLoginMessage(`Successfully logged ${user.firstName} as Tutor! Redirecting...`)
                 setTimeout(() => router.push("/tutor"), 2000)
             }
@@ -143,7 +89,8 @@ const [user, setUser] = useState({
             htmlFor="email">Email</label>
             <input type="email" className="text-xl border-solid border-2 border-blue-600 rounded-lg w-full mb-2" 
             id="email" name="email"
-            onChange={(e) => setEmail(e.target.value)}></input>
+            onChange={(e) => setEmail(e.target.value)}
+            onBlur={(e) => handleFindUser(e, e.target.value)}></input>
 
             <label className="text-lg" htmlFor="password">Password</label>
             <input type="password" className="text-xl border-solid border-2 border-blue-600 rounded-lg w-full" 
