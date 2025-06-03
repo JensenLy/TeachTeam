@@ -4,8 +4,8 @@
     import { useState } from "react"
     import { useRouter } from "next/router"
     import { useContext } from "react";
-    import { loginContext } from "@/contexts/LoginContext";
-    import { Users } from "./types/users";
+    import { loginContext, LoginContextType } from "@/contexts/LoginContext";
+    import { Users } from "../types/users";
 
     // a list of users which are 3 tutors and 3 lecturers
     const userData: Users[] = [
@@ -62,7 +62,7 @@ export default function SignIn(){
 const[email, setEmail] = useState<string>("")
 const[password, setPassword] = useState<string>("")
 const[loginMessage, setLoginMessage] = useState<string>("")
-const{setIsLoggedIn, setFirstNameLogedIn, setEmailLogedIn, setLastNameLogedIn, setUserRole} = useContext(loginContext) 
+const{setIsLoggedIn, setFirstNameLogedIn, setEmailLogedIn, setLastNameLogedIn, setUserRole} = useContext(loginContext) as LoginContextType;
 const router = useRouter()
 
 useEffect(()=>{

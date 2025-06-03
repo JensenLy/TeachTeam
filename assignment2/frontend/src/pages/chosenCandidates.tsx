@@ -4,15 +4,15 @@ import Header from "../components/header"
 import Footer from "../components/footer";
 import Sidebar from "../components/sidebar";
 import { useContext } from "react";
-import { loginContext } from "@/contexts/LoginContext";
+import { loginContext, LoginContextType } from "@/contexts/LoginContext";
 
 export default function Lecturer() {
     
 const[comment, setComment] = useState<Record<number, string>>({});
 const[sentComment, setSentComment] = useState<{ [index: number]: string[] }>({});
-const[chosenCandidates, setChosenCandidates] = useState<{ [index: number]: boolean }>({});
+// const[chosenCandidates, setChosenCandidates] = useState<{ [index: number]: boolean }>({});
 const[candidateArray, setCandidateArray] = useState<ApplicationData[]>([]);
-const{lastNameLogedIn, firstNameLogedIn} = useContext(loginContext)
+const{lastNameLogedIn, firstNameLogedIn} = useContext(loginContext) as LoginContextType;
 
 interface ApplicationData{
     firstName: string
@@ -61,7 +61,7 @@ interface ApplicationData{
 
                 const email = localStorage.getItem("emailLogedIn") || "[]"; //get email
                 //get lecturer's chosen candidates from local storage
-                const storedLecturer = JSON.parse(localStorage.getItem(email) || "{}");
+                const storedLecturer: ApplicationData[] =  JSON.parse(localStorage.getItem(email) || "{}");
 
                 //same process as above but this time save to the lecuter's data on local storage 
                 if (storedLecturer[index]) {   
@@ -99,15 +99,15 @@ interface ApplicationData{
 
     useEffect(() => {
         const email = localStorage.getItem("emailLogedIn") || "[]"; //get email 
-        const storedLecturer = JSON.parse(localStorage.getItem(email) || "{}"); //get lecturer's data 
+        const storedLecturer: ApplicationData[] = JSON.parse(localStorage.getItem(email) || "{}"); //get lecturer's data 
     
         if (storedLecturer && Array.isArray(storedLecturer)) { //check if storedLecturer exists and is an array 
             const commentMap: { [index: number]: string[] } = {}; //map to store candidate's comments
             const chosenMap: { [index: number]: boolean } = {}; //map to store chosen candidates
     
-            storedLecturer.forEach((candidate: any, index: number) => {//loop through the chosen candidates list
+            storedLecturer.forEach((candidate, index: number) => {//loop through the chosen candidates list
                 if (candidate) { //mark them as chosen if they are not null
-                    chosenMap[index] = candidate;
+                    chosenMap[index] = true;
     
                     if (Array.isArray(candidate.comment)) {//if that candidate have comments, store it to comment map 
                         commentMap[index] = candidate.comment;
@@ -117,7 +117,7 @@ interface ApplicationData{
             
             //set the state with the new data 
             setSentComment(commentMap);
-            setChosenCandidates(chosenMap);
+            // setChosenCandidates(chosenMap);
             setCandidateArray([...storedLecturer]);
         }
     }, []);

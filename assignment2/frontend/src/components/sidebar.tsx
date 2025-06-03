@@ -1,6 +1,6 @@
 import styles from "../styles/sidebar.module.css"
 import React, { useState } from 'react';
-import { loginContext } from "@/contexts/LoginContext";
+import { loginContext, LoginContextType } from "@/contexts/LoginContext";
 import { useContext } from "react";
 import { useRouter } from 'next/router';
 import Link from "next/link";
@@ -9,7 +9,7 @@ export default function Sidebar() {
     const router = useRouter();
     const currentPath = router.pathname;
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-    const {setIsLoggedIn, userRole, firstNameLogedIn} = useContext(loginContext)
+    const {setIsLoggedIn, userRole, firstNameLogedIn} = useContext(loginContext) as LoginContextType
     const toggleSidebar = () => {
         setIsSidebarCollapsed(prevState => !prevState);
     };

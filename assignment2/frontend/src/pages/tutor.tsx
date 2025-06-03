@@ -4,8 +4,8 @@ import Header from "../components/header"
 import Footer from "../components/footer";
 import Sidebar from "../components/sidebar";
 import { useContext } from "react";
-import { loginContext } from "@/contexts/LoginContext";
-import { JobInfo } from './types/jobInfo';
+import { loginContext, LoginContextType } from "@/contexts/LoginContext";
+import { JobInfo } from '../types/jobInfo';
 import SuccessScreen from '@/components/successScreen';
 
 export default function Tutor() {
@@ -17,7 +17,7 @@ export default function Tutor() {
     const[successfullySubmittedForm, setSuccessfullySubmittedForm] = useState<boolean>(false)
     const[screenState, setScreenState] = useState<boolean>(true)
     const[courseCodeAppliedTo, setcourseCodeAppliedTo] = useState<string>("")
-    const context = useContext(loginContext);
+    const context = useContext(loginContext) as LoginContextType;
 
     interface ApplicationData{
         firstName: string

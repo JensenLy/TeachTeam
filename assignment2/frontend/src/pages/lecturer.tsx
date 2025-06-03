@@ -3,7 +3,7 @@ import Header from "../components/header";
 import Footer from "../components/footer";
 import SideBar from "../components/sidebar";
 import styles from "../styles/sidebar.module.css";
-import { Applicant } from "./types/applicants";
+import { Applicant } from "../types/applicants";
 
 export default function Lecturer() {
   const [applicationData, setApplicationData] = useState<Applicant[]>([]);
@@ -20,7 +20,7 @@ export default function Lecturer() {
     setApplicationData(data); //set the useState
 
     //load all of the chosenCandidates from lecturer's data (identified by email) to storedLecturer
-    const storedLecturer = JSON.parse(localStorage.getItem(email) || "{}"); 
+    const storedLecturer = JSON.parse(localStorage.getItem(email) || "{}") as Applicant[] | null; 
 
     //check if storedLecturer exists and if it is an array
     if (storedLecturer && Array.isArray(storedLecturer)) {
@@ -28,7 +28,7 @@ export default function Lecturer() {
       const chosenMap: { [index: number]: boolean } = {};
     
       //loop through the storedLecturer data for candidates 
-      storedLecturer.forEach((candidate: any, index: number) => {
+      storedLecturer.forEach((candidate: Applicant | null, index: number) => {
         //mark them as chosen if a candidate exists at this index
         if (candidate !== null) {
           chosenMap[index] = true;

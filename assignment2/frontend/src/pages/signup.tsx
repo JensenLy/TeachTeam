@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { UserData } from "./types/userData";
+import { UserData } from "../types/userData";
 
 export default function SignUp(){
 
