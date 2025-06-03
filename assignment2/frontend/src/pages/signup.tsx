@@ -1,38 +1,50 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { UserData } from "../types/userData";
+import { userApi } from "../services/api";
 
 export default function SignUp(){
 
-const[firstName, setFirstName] = useState<string>("")
-const[lastName, setLastName] = useState<string>("")
-const[email, setEmail] = useState<string>("")
-const[password, setPassword] = useState<string>("")
 const[confirmPassword, setConfirmPassword] = useState<string>("")
 const[userRole, setUserRole] = useState<string>("")
 const[successfullySubmittedForm, setSuccessfullySubmittedForm] = useState<boolean>(false)
+const [newUser, setNewUser] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password:"",
+    role: "",
+  });
 
 const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    if (password !== confirmPassword) {
+    if (newUser.password !== confirmPassword) {
       alert("Passwords do not match. Please try again.");
       return;
     }
 
-    const userSignUpData: UserData = {
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      password: password,
-      userRole: userRole
-    }
+    handleCreateUser(e)
+    
     // add new user to local storage
-    localStorage.setItem("UserData", JSON.stringify(userSignUpData))
+    // localStorage.setItem("UserData", JSON.stringify(userSignUpData))
     setSuccessfullySubmittedForm(true)
 
 }
+
+const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log(newUser)
+    try {
+      console.log(newUser)
+      await userApi.createUser(newUser);
+    } catch (err) {
+      console.log("Failed to add user");
+      console.log(err);
+    }
+
+  };
+  
 // if user succesfully made a new account show success
 if(successfullySubmittedForm){
   return(
@@ -67,14 +79,14 @@ else{
             type="text" 
             name="fname" 
             id="fname"
-            onChange={(e) => setFirstName(e.target.value)} 
+            onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })} 
             required></input>
 
             <input placeholder="Last Name" className="flex-1 border-2 rounded-md border-blue-600 text-lg p-1 w-full"  
             type="text" 
             name="fname" 
             id="fname"
-            onChange={(e) => setLastName(e.target.value)} 
+            onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
             required></input>
             </div>
 
@@ -83,14 +95,14 @@ else{
             name='email' id='email' 
             placeholder='example@email.com' 
             pattern="/^[a-zA-Z0-9.!#$%&'+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$/" 
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
             required></input>
 
             <input placeholder="New Password"className="border-2 rounded-md border-blue-600 text-lg p-1 w-full"
             type="password" 
             name="createPassword" 
             minLength={8}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
             required></input>
 
             <input placeholder="Confirm Password" className="border-2 rounded-md border-blue-600 text-lg p-1 w-full"
@@ -112,6 +124,7 @@ else{
               value="tutor"
               onChange={(e) =>{
                 setUserRole(e.target.value)
+                setNewUser({ ...newUser, role: e.target.value })
               }}
               checked={userRole === "tutor"}
               className="hidden"
@@ -128,6 +141,7 @@ else{
                 value="lecturer"
                 onChange={(e)=>{
                   setUserRole(e.target.value)
+                  setNewUser({ ...newUser, role: e.target.value })
                 }}
                 checked={userRole === "lecturer"}
                 className="hidden"

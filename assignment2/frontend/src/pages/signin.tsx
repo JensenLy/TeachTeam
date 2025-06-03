@@ -6,6 +6,7 @@
     import { useContext } from "react";
     import { loginContext, LoginContextType } from "@/contexts/LoginContext";
     import { Users } from "../types/users";
+    import { userApi } from "../services/api";
 
     // a list of users which are 3 tutors and 3 lecturers
     const userData: Users[] = [
@@ -64,18 +65,35 @@ const[password, setPassword] = useState<string>("")
 const[loginMessage, setLoginMessage] = useState<string>("")
 const{setIsLoggedIn, setFirstNameLogedIn, setEmailLogedIn, setLastNameLogedIn, setUserRole} = useContext(loginContext) as LoginContextType;
 const router = useRouter()
+const [error, setError] = useState<string | null>(null);
+const [user, setUser] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password:"",
+    role: "",
+  });
 
-useEffect(()=>{
-    localStorage.setItem("userData", JSON.stringify(userData))
-},[]);
+    useEffect(()=>{
+        localStorage.setItem("userData", JSON.stringify(userData))
+    },[]);
+
+    const handleFindUser = async (e: React.FormEvent, email:string) => {
+        e.preventDefault();
+        try {
+            const data = await userApi.getUserByEmail(email);
+            setUser(data);
+        } catch (err) {
+            setError("email failed");
+            console.log(err);
+        }
+    };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // get array of stored user data
-        const storedUserData = JSON.parse(localStorage.getItem("userData") || "[]");
-
-        // check if input email matches any of user data emails
-        const currentUser = storedUserData.find((user: Users) => user.email.toLowerCase() === email.toLowerCase())
+        
+        //find user 
+        handleFindUser(e, email)
 
         //min 8 characters, 1 capital letter, and 1 special character
         const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}":;'?/>.<,]).{8,}$/;
@@ -86,43 +104,28 @@ useEffect(()=>{
             return;
         }
         
-        if(!currentUser){
+        if(error){
             setLoginMessage("Email not found ❌");
+            setError(null)
             return;
         }
-      
-        if(currentUser.password === password){
-            if(currentUser.userRole === "Tutor"){
+        
+        if(user.password === password){
             setIsLoggedIn(true)
-            setFirstNameLogedIn(currentUser.firstName)
-            setLastNameLogedIn(currentUser.lastName)
+            setFirstNameLogedIn(user.firstName)
+            setLastNameLogedIn(user.lastName)
             setEmailLogedIn(email)
-            setUserRole(currentUser.userRole)
+            setUserRole(user.role)
 
-            localStorage.setItem("firstNameLogedIn", currentUser.firstName);
-            localStorage.setItem("lastNameLogedIn", currentUser.lastName);
-            localStorage.setItem("emailLogedIn", currentUser.email);
-            localStorage.setItem("userRole", currentUser.userRole);
-
-            setLoginMessage(`Successfully logged ${currentUser.firstName} as Tutor! Redirecting...`)
-            setTimeout(() => router.push("/tutor"), 2000)
-        }
-        else{
-            setIsLoggedIn(true)
-            setFirstNameLogedIn(currentUser.firstName)
-            setLastNameLogedIn(currentUser.lastName)
-            setEmailLogedIn(email)
-            setUserRole(currentUser.userRole)
-
-            localStorage.setItem("firstNameLogedIn", currentUser.firstName);
-            localStorage.setItem("lastNameLogedIn", currentUser.lastName);
-            localStorage.setItem("emailLogedIn", currentUser.email);
-            localStorage.setItem("userRole", currentUser.userRole);
-
-            setLoginMessage(`Successfully logged ${currentUser.firstName} as Lecturer! Redirecting...`)
-            setTimeout(() => router.push("/lecturer"), 2000)
-        }
-    }
+            if(user.role === "Tutor"){
+                setLoginMessage(`Successfully logged ${user.firstName} as Tutor! Redirecting...`)
+                setTimeout(() => router.push("/tutor"), 2000)
+            }
+            else{
+                setLoginMessage(`Successfully logged ${user.firstName} as Lecturer! Redirecting...`)
+                setTimeout(() => router.push("/lecturer"), 2000)
+            }
+        }   
         else{
             setLoginMessage("Invalid password ❌")
         }
