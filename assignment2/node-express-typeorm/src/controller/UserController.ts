@@ -24,9 +24,10 @@ export class UserController {
    * @returns JSON response containing the user if found, or 404 error if not found
    */
   async one(request: Request, response: Response) {
-    const id = parseInt(request.params.id);
+    const email = request.params.email;
+    const pass = request.params.password
     const user = await this.userRepository.findOne({
-      where: { id },
+      where: { email: email, password: pass},
     });
 
     if (!user) {
@@ -42,13 +43,14 @@ export class UserController {
    * @returns JSON response containing the created user or error message
    */
   async save(request: Request, response: Response) {
-    const { firstName, lastName, email, age } = request.body;
+    const { firstName, lastName, email, password, role } = request.body;
 
     const user = Object.assign(new User(), {
       firstName,
       lastName,
       email,
-      age,
+      password,
+      role,
     });
 
     try {

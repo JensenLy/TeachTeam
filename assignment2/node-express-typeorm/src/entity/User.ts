@@ -21,7 +21,13 @@ export class User {
   email: string;
 
   @Column()
-  age: number;
+  password: string;
+
+  @Column({ default: "" })
+  role: string;
+
+  // @Column()
+  // age: number;
 
   @CreateDateColumn()
   createdAt: Date;

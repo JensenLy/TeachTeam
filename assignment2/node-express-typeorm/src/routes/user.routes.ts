@@ -8,7 +8,7 @@ router.get("/users", async (req, res) => {
   await userController.all(req, res);
 });
 
-router.get("/users/:id", async (req, res) => {
+router.get("/users/:email", async (req, res) => {
   await userController.one(req, res);
 });
 
