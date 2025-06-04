@@ -24,4 +24,8 @@ router.delete("/users/:id", async (req, res) => {
   await userController.remove(req, res);
 });
 
+router.post("/users/verify", async (req, res) => {
+  await userController.verifyPassword(req, res);
+});
+
 export default router;

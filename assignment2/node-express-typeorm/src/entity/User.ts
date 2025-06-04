@@ -5,10 +5,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  BeforeInsert,
 } from "typeorm";
 
+import argon2 from "argon2";
 import { Applications } from "./Applications";
 import { Comment } from "./Comment";
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -25,6 +28,11 @@ export class User {
 
   @Column()
   password: string;
+
+  @BeforeInsert()
+  async hashPassword() {
+    this.password = await argon2.hash(this.password);
+  }
 
   @Column({
     type: "enum",

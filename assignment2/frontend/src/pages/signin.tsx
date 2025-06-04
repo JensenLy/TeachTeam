@@ -6,27 +6,26 @@
     import { useContext } from "react";
     import { loginContext, LoginContextType } from "@/contexts/LoginContext";
     import { userApi } from "../services/api";
-
+    import argon2 from "argon2";
     // a list of users which are 3 tutors and 3 lecturers
 
-export default function SignIn(){
-const[email, setEmail] = useState<string>("")
-const[password, setPassword] = useState<string>("")
-const[loginMessage, setLoginMessage] = useState<string>("")
-const{setIsLoggedIn, setFirstNameLogedIn, setEmailLogedIn, setLastNameLogedIn, setUserRole} = useContext(loginContext) as LoginContextType;
-const router = useRouter()
-const [user, setUser] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password:"",
-    role: "",
-  });
+    export default function SignIn(){
+    const[email, setEmail] = useState<string>("")
+    const[password, setPassword] = useState<string>("")
+    const[loginMessage, setLoginMessage] = useState<string>("")
+    const{setIsLoggedIn, setFirstNameLogedIn, setEmailLogedIn, setLastNameLogedIn, setUserRole} = useContext(loginContext) as LoginContextType;
+    const router = useRouter()
+    const [user, setUser] = useState({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password:"",
+        role: "",
+    });
 
 
 
-    const handleFindUser = async (e: React.FormEvent, email:string) => {
-        e.preventDefault();
+    const handleFindUser = async (email:string) => {
         try {
             const data = await userApi.getUserByEmail(email);
             setUser(data);
@@ -36,11 +35,11 @@ const [user, setUser] = useState({
         }
     };
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         
         //find user 
-        handleFindUser(e, email)
+        handleFindUser(email)
 
         //min 8 characters, 1 capital letter, and 1 special character
         const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}":;'?/>.<,]).{8,}$/;
@@ -56,7 +55,9 @@ const [user, setUser] = useState({
             return;
         }
         
-        if(user.password === password){
+        const isValidPassword = await userApi.verifyPassword(email, password);
+
+        if(isValidPassword){
             setIsLoggedIn(true)
             setFirstNameLogedIn(user.firstName)
             setLastNameLogedIn(user.lastName)
@@ -64,7 +65,8 @@ const [user, setUser] = useState({
             setUserRole(user.role)
 
             if(user.role === "candidate"){
-                setLoginMessage(`Successfully logged ${user.firstName} as Tutor! Redirecting...`)
+
+                setLoginMessage(`Successfully logged ${user.firstName} as candidate! Redirecting...`)
                 setTimeout(() => router.push("/tutor"), 2000)
             }
             else{
@@ -90,7 +92,7 @@ const [user, setUser] = useState({
             <input type="email" className="text-xl border-solid border-2 border-blue-600 rounded-lg w-full mb-2" 
             id="email" name="email"
             onChange={(e) => setEmail(e.target.value)}
-            onBlur={(e) => handleFindUser(e, e.target.value)}></input>
+            onBlur={(e) => handleFindUser(e.target.value)}></input>
 
             <label className="text-lg" htmlFor="password">Password</label>
             <input type="password" className="text-xl border-solid border-2 border-blue-600 rounded-lg w-full" 

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const api = axios.create({
-  baseURL: "http://localhost:3001/api", // Adjust this to match your backend URL
+  baseURL: "http://localhost:3001/api", 
 });
 
 export interface User {
@@ -38,4 +38,9 @@ export const userApi = {
     const response = await api.delete(`/users/${id}`);
     return response.data;
   },
+
+  verifyPassword: async (email: string, password: string) => {
+    const response = await api.post("/users/verify", { email, password });
+    return response.data;
+  }
 };

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { User } from "../entity/User";
+import argon2 from "argon2";
 
 export class UserController {
   private userRepository = AppDataSource.getRepository(User);
@@ -63,6 +64,27 @@ export class UserController {
     }
   }
 
+  async verifyPassword(request: Request, response: Response) {
+    const { email, password } = request.body;
+
+    try{
+      const user = await this.userRepository.findOne({ where: { email } });
+
+      if (!user) {
+        return response.status(404).json({ message: "User not found" });
+      }
+
+      const isValidPassword = await argon2.verify(user.password, password);
+
+      if(!isValidPassword) {
+        return response.status(401).json({ message: "Invalid password" });
+      }
+
+      return response.json({ message: "Password is valid" });
+    } catch (error) {
+      return response.status(500).json({ message: "Error verifying password", error });
+    }
+  }
   /**
    * Deletes a user from the database by their ID
    * @param request - Express request object containing the user ID in params

@@ -24,19 +24,13 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       return;
     }
 
-    handleCreateUser(e)
+    handleCreateUser()
     
-    // add new user to local storage
-    // localStorage.setItem("UserData", JSON.stringify(userSignUpData))
     setSuccessfullySubmittedForm(true)
-
 }
 
-const handleCreateUser = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log(newUser)
+const handleCreateUser = async () => {
     try {
-      console.log(newUser)
       await userApi.createUser(newUser);
     } catch (err) {
       console.log("Failed to add user");
@@ -115,11 +109,11 @@ else{
             <h2 className="text-lg">Select whichever applies best to you:</h2>
              
             <div className="flex gap-4 justify-center items-center w-full">
-            <label htmlFor="tutor" className={  `cursor-pointer ${userRole === "candidate" ? "bg-blue-500 text-white" : "bg-gray-200"} 
+            <label htmlFor="candidate" className={  `cursor-pointer ${userRole === "candidate" ? "bg-blue-500 text-white" : "bg-gray-200"} 
             p-2 rounded-lg transition duration-300 ease-in-out hover:bg-blue-500 hover:text-white w-full text-center`}>
             <input
               type="radio"
-              id="tutor"
+              id="candidate"
               name="role"
               value="candidate"
               onChange={(e) =>{
