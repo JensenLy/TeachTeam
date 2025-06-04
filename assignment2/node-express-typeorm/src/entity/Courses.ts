@@ -34,7 +34,7 @@ export class Courses {
     @CreateDateColumn()
     createdAt: Date;
 
-    @OneToMany(() => Applications, application => application.Courses)
+    @OneToMany(() => Applications, application => application.courses)
     @JoinColumn({ name: "applicationsId" })
     applications: Applications[];
 

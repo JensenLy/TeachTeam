@@ -5,7 +5,6 @@ import {
   CreateDateColumn,
   Unique,
   OneToMany,
-  ManyToOne,
   JoinColumn,
   OneToOne,
 } from "typeorm";
@@ -15,7 +14,7 @@ import { Courses } from "./Courses";
 import { CandidateProfile } from "./CandidateProfile";
 
 @Entity()
-@Unique(["user", "job"]) // Ensure a user can only apply to a job once
+@Unique(["candidate", "courses"]) // Ensure a user can only apply to a job once
 export class Applications {
   @PrimaryGeneratedColumn()
   applicationId: number;
@@ -31,9 +30,9 @@ export class Applications {
   @JoinColumn({ name: "candidateId" })
   candidate: CandidateProfile;
 
-  @OneToOne(() => Courses, Courses => Courses.applications)
+  @OneToOne(() => Courses, courses => courses.applications)
   @JoinColumn({ name: "courseId" })
-  Courses: Courses;
+  courses: Courses;
 
   @OneToMany(() => Comment, comment => comment.application)
   @JoinColumn({ name: "commentsId" })
