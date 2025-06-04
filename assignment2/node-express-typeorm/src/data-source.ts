@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { User } from "./entity/User";
 import { Applications } from "./entity/Applications";
-import { Job } from "./entity/Jobs";
+import { Job } from "./entity/Courses";
 import { Comment } from "./entity/Comment";
 
 export const AppDataSource = new DataSource({

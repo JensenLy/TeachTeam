@@ -6,10 +6,12 @@ import {
   CreateDateColumn,
   OneToOne,
   ManyToOne,
+  JoinColumn,
 } from "typeorm";
 
 import { Applications } from "./Applications";
 import { User } from "./User";
+import { LecturerProfile } from "./LecturerProfile";
 
 @Entity()
 export class Comment { 
@@ -22,12 +24,11 @@ export class Comment {
   @CreateDateColumn()
   createdAt: Date;
 
-  // Foreign key to Applications
-  @ManyToOne(() => Applications, application => application.comments, {nullable: false})
+  @OneToOne(() => Applications, application => application.comments, {nullable: true})
+  @JoinColumn({ name: "applicationId" })
   application: Applications;
 
-  // Foreign key to User
-  // only lecturer can comment
-  @ManyToOne(() => User, lecturer => lecturer.comment, {nullable: false})
+  @OneToOne(() => LecturerProfile, lecturer => lecturer.comments)
+  @JoinColumn({ name: "lecturerId" })
   lecturer: User;
 }

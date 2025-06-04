@@ -6,11 +6,13 @@ import {
   UpdateDateColumn,
   OneToMany,
   BeforeInsert,
+  OneToOne,
+  JoinColumn,
 } from "typeorm";
 
 import argon2 from "argon2";
-import { Applications } from "./Applications";
-import { Comment } from "./Comment";
+import { LecturerProfile } from "./LecturerProfile";
+import { CandidateProfile } from "./CandidateProfile";
 
 @Entity()
 export class User {
@@ -47,10 +49,11 @@ export class User {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Applications, application => application.user)
-  applications: Applications[];
-  // lecturer can comment on applications
-  // nullable: true means that a user can exist without comments
-  @OneToMany(() => Comment, comment => comment.lecturer, { nullable: true })
-  comment: Comment[];
+  @OneToOne(() => LecturerProfile, (lecturerProfile) => lecturerProfile.user, { nullable: true })
+  @JoinColumn({ name: "lecturerId" })
+  lecturerProfile: LecturerProfile;
+
+  @OneToOne(() => CandidateProfile, (candidateProfile) => candidateProfile.user, { nullable: true })
+  @JoinColumn({ name: "candidateId" })
+  candidateProfile: CandidateProfile;
 }

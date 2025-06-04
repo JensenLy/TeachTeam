@@ -5,18 +5,20 @@ import {
   CreateDateColumn,
   Unique,
   OneToMany,
-  ManyToOne
+  ManyToOne,
+  JoinColumn,
+  OneToOne,
 } from "typeorm";
 
-import { User } from "./User";
 import { Comment } from "./Comment";
-import { Job } from "./Jobs";
+import { Courses } from "./Courses";
+import { CandidateProfile } from "./CandidateProfile";
 
 @Entity()
 @Unique(["user", "job"]) // Ensure a user can only apply to a job once
 export class Applications {
   @PrimaryGeneratedColumn()
-  id: number;
+  applicationId: number;
 
   @Column({default: "pending"})
   status: string;
@@ -25,12 +27,15 @@ export class Applications {
   @CreateDateColumn()
   appliedAt: Date;
 
-  @ManyToOne(() => User, user => user.applications)
-  user: User;
-  // job foreign key
-  @ManyToOne(() => Job, job => job.applications)
-  job: Job;
+  @OneToOne(() => CandidateProfile, candidate => candidate.application)
+  @JoinColumn({ name: "candidateId" })
+  candidate: CandidateProfile;
+
+  @OneToOne(() => Courses, Courses => Courses.applications)
+  @JoinColumn({ name: "courseId" })
+  Courses: Courses;
 
   @OneToMany(() => Comment, comment => comment.application)
+  @JoinColumn({ name: "commentsId" })
   comments: Comment[];
 }
