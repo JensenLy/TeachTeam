@@ -63,7 +63,7 @@ const [user, setUser] = useState({
             setEmailLogedIn(email)
             setUserRole(user.role)
 
-            if(user.role === "tutor"){
+            if(user.role === "candidate"){
                 setLoginMessage(`Successfully logged ${user.firstName} as Tutor! Redirecting...`)
                 setTimeout(() => router.push("/tutor"), 2000)
             }

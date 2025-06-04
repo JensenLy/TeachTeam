@@ -24,10 +24,10 @@ export default function Sidebar() {
     }
 
     let isTutor:boolean = true; 
-    if (userRole === "Tutor"){ 
+    if (userRole === "candidate"){ 
         isTutor = true; 
     }
-    else if (userRole === "Lecturer") { 
+    else if (userRole === "lecturer") { 
         isTutor = false; 
     }
 

@@ -115,20 +115,20 @@ else{
             <h2 className="text-lg">Select whichever applies best to you:</h2>
              
             <div className="flex gap-4 justify-center items-center w-full">
-            <label htmlFor="tutor" className={  `cursor-pointer ${userRole === "tutor" ? "bg-blue-500 text-white" : "bg-gray-200"} 
+            <label htmlFor="tutor" className={  `cursor-pointer ${userRole === "candidate" ? "bg-blue-500 text-white" : "bg-gray-200"} 
             p-2 rounded-lg transition duration-300 ease-in-out hover:bg-blue-500 hover:text-white w-full text-center`}>
             <input
               type="radio"
               id="tutor"
               name="role"
-              value="tutor"
+              value="candidate"
               onChange={(e) =>{
                 setUserRole(e.target.value)
                 setNewUser({ ...newUser, role: e.target.value })
               }}
-              checked={userRole === "tutor"}
+              checked={userRole === "candidate"}
               className="hidden"
-              required></input>Tutor</label>
+              required></input>Candidate</label>
 
             <label
               htmlFor="lecturer"

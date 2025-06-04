@@ -23,7 +23,7 @@ return (
             <nav className="hidden lg:flex">
                 <ul className="flex gap-4">
                     {isLoggedIn ? (
-                        userRole === "Lecturer" ? (
+                        userRole === "lecturer" ? (
                     <>
                     <li><Link className="hover:bg-sky-700 duration-75 rounded-md p-3" href="/lecturer">Lecturer Page</Link></li>
                     <li><Link className="hover:bg-sky-700 duration-75 rounded-md p-3" onClick={() => setIsLoggedIn(false)} data-testid="lecturer-signOut" 
@@ -47,7 +47,7 @@ return (
             <nav className={`lg:hidden ${isOpen ? "block" : "hidden"} absolute top-20 right-0 bg-blue-500 w-full`}>
                 <ul className="flex flex-col items-center gap-4 p-4">
                     {isLoggedIn ? (
-                        userRole === "Lecturer" ? (
+                        userRole === "lecturer" ? (
                     <>
                     <li><Link className="hover:bg-sky-700 duration-75 rounded-md p-3" href="/lecturer">Lecturer Page</Link></li>
                     <li><Link className="hover:bg-sky-700 duration-75 rounded-md p-3" onClick={() => setIsLoggedIn(false)} href="/">Sign Out</Link></li>
