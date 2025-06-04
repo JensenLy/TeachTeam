@@ -42,5 +42,6 @@ export const userApi = {
   verifyPassword: async (email: string, password: string) => {
     const response = await api.post("/users/verify", { email, password });
     return response.data;
-  }
+  },
+
 };

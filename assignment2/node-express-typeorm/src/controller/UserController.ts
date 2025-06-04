@@ -2,10 +2,13 @@ import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { User } from "../entity/User";
 import argon2 from "argon2";
+import { LecturerProfile } from "../entity/LecturerProfile";
+import { CandidateProfile } from "../entity/CandidateProfile";
 
 export class UserController {
   private userRepository = AppDataSource.getRepository(User);
-
+  private lecturerRepository = AppDataSource.getRepository(LecturerProfile);
+  private candidateRepository = AppDataSource.getRepository(CandidateProfile);
   /**
    * Retrieves all users from the database
    * @param request - Express request object
@@ -56,6 +59,26 @@ export class UserController {
 
     try {
       const savedUser = await this.userRepository.save(user);
+
+      if(user.role === "lecturer") {
+        const lecturerProfile = new LecturerProfile();
+        lecturerProfile.user = savedUser; // Associate the user with the lecturer profile
+
+        const savedProfile = await this.lecturerRepository.save(lecturerProfile);
+
+        savedUser.lecturerProfile = savedProfile; 
+        await this.userRepository.save(savedUser);
+      }
+      else if(user.role === "candidate") {
+        const candidateProfile = new CandidateProfile();
+        candidateProfile.user = savedUser; // Associate the user with the candidate profile 
+
+        const savedProfile = await this.candidateRepository.save(candidateProfile)
+
+        savedUser.candidateProfile = savedProfile
+        await this.userRepository.save(savedUser)
+      }
+
       return response.status(201).json(savedUser);
     } catch (error) {
       return response

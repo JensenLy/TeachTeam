@@ -28,7 +28,7 @@ const handleFindUser = async (email:string) => {
   }
 };
 
-const handlePassword = async (password:string) => {
+const handlePassword = (password:string) => {
   const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}":;'?/>.<,]).{8,}$/;
     
     if(passwordRegex.test(password)){
@@ -42,6 +42,10 @@ const handlePassword = async (password:string) => {
 const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if(userRole === "lecturer"){
+     } 
+    else{
+     }
     if (newUser.password !== confirmPassword) {
       alert("Passwords do not match. Please try again.");
       return;
