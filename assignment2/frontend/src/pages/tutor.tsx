@@ -23,6 +23,7 @@ export default function Tutor() {
     const [error, setError] = useState<string | null>(null);
     
     const [course, setCourse] = useState({
+        courseId: 0,
         title: "",
         description: "",
         courseCode: "",
@@ -141,7 +142,7 @@ export default function Tutor() {
     }
 
     // swap (or switch or whatever) between the jobs card and the form 
-    const swapScreen = (e: React.MouseEvent<HTMLButtonElement>, programCode?: string) => {    
+    const swapScreen = (e: React.MouseEvent<HTMLButtonElement>, programCode?: string, type?:string) => {    
         e.preventDefault(); //same as above, prevent refreshing 
         if(typeof programCode !== "undefined"){ //set the program code for the form if there's none 
             setcourseCodeAppliedTo(programCode)
@@ -163,7 +164,7 @@ export default function Tutor() {
                             <li><h2>{course.title} - {course.type}</h2></li>
 
                             {/* trigger the swap screen in this button, will be the same for other jobs below */}
-                            <button className="bg-blue-500 hover:bg-sky-700" type="button" onClick={(e) => {swapScreen(e, course.title)}}>Apply Now!</button>
+                            <button className="bg-blue-500 hover:bg-sky-700" type="button" onClick={(e) => {swapScreen(e, course.title, course.type)}}>Apply Now!</button>
 
                             <li>
                                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#7f8992"><path d="M520-120v-80h80v80h-80Zm-80-80v-200h80v200h-80Zm320-120v-160h80v160h-80Zm-80-160v-80h80v80h-80Zm-480 80v-80h80v80h-80Zm-80-80v-80h80v80h-80Zm360-280v-80h80v80h-80ZM180-660h120v-120H180v120Zm-60 60v-240h240v240H120Zm60 420h120v-120H180v120Zm-60 60v-240h240v240H120Zm540-540h120v-120H660v120Zm-60 60v-240h240v240H600Zm80 480v-120h-80v-80h160v120h80v80H680ZM520-400v-80h160v80H520Zm-160 0v-80h-80v-80h240v80h-80v80h-80Zm40-200v-160h80v80h80v80H400Zm-190-90v-60h60v60h-60Zm0 480v-60h60v60h-60Zm480-480v-60h60v60h-60Z"/></svg>

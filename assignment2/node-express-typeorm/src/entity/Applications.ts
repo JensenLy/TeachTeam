@@ -29,6 +29,15 @@ export class Applications {
   @Column()
   availability: Date;
 
+  @Column()
+  skills: Date;
+
+  @Column()
+  academic: Date;
+
+  @Column()
+  prevRoles: Date;
+
   @OneToOne(() => CandidateProfile, candidate => candidate.application)
   @JoinColumn({ name: "candidateId" })
   candidate: CandidateProfile;
