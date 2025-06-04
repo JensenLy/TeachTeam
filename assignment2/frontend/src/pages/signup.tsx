@@ -19,27 +19,28 @@ const [newUser, setNewUser] = useState({
   });
 
 const handleFindUser = async (email:string) => {
-        try {
-            await userApi.getUserByEmail(email);
-            setError("Email existed ❌")
-        } catch (err) {
-            console.log(err);
-            setError(null)
-        }
-    };
+  try {
+      await userApi.getUserByEmail(email);
+      setError("Email existed ❌")
+  } catch (err) {
+      console.log(err);
+      setError(null)
+  }
+};
+
+const handlePassword = async (password:string) => {
+  const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}":;'?/>.<,]).{8,}$/;
+    
+    if(passwordRegex.test(password)){
+      setSignUpMessage("")
+    }
+    else{
+      setSignUpMessage("Password must be at least 8 characters, contain 1 uppercase letter, and 1 special character ❌");
+    }
+};
 
 const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}":;'?/>.<,]).{8,}$/;
-    
-    if(!passwordRegex.test(newUser.password)){
-      setSignUpMessage("Password must be at least 8 characters, contain 1 uppercase letter, and 1 special character ❌");
-      return;
-    }
-    else{
-      setSignUpMessage("")
-    }
 
     if (newUser.password !== confirmPassword) {
       alert("Passwords do not match. Please try again.");
@@ -126,6 +127,7 @@ else{
             name="createPassword" 
             minLength={8}
             onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+            onBlur={(e) => handlePassword(e.target.value)}
             required></input>
 
             {signUpMessage && (
@@ -177,7 +179,7 @@ else{
                 required></input>Lecturer</label>
 
             </div>
-            {error ? 
+            {error || signUpMessage ? 
               <button className="text-{6vh} text-white p-1 hover:cursor-pointer bg-red-600 rounded-lg text-white w-full text-lg">Submit</button>
              : 
               <button className="text-{6vh} text-white p-1 hover:cursor-pointer bg-blue-600 hover:bg-blue-500 rounded-lg text-white w-full text-lg" 
