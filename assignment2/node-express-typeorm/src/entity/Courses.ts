@@ -23,6 +23,9 @@ export class Courses {
     description: string;
 
     @Column()
+    requirement: string;
+
+    @Column()
     courseCode: string;
 
     @Column()

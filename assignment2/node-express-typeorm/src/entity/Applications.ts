@@ -26,6 +26,9 @@ export class Applications {
   @CreateDateColumn()
   appliedAt: Date;
 
+  @Column()
+  availability: Date;
+
   @OneToOne(() => CandidateProfile, candidate => candidate.application)
   @JoinColumn({ name: "candidateId" })
   candidate: CandidateProfile;
