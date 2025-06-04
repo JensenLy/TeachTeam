@@ -13,6 +13,16 @@ export interface User {
   role: string;
 }
 
+export interface Course {
+  title: string,
+  description: string,
+  courseCode: string,
+  type: string,
+  location: string,
+  createdAt: string, 
+  requirement: string,
+}
+
 export const userApi = {
   getAllUsers: async () => {
     const response = await api.get("/users");
@@ -44,4 +54,11 @@ export const userApi = {
     return response.data;
   },
 
+};
+
+export const courseApi = {
+  getAllCourses: async () => {
+    const response = await api.get("/courses");
+    return response.data;
+  },
 };
