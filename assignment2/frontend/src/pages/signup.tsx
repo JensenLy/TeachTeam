@@ -8,6 +8,8 @@ export default function SignUp(){
 const[confirmPassword, setConfirmPassword] = useState<string>("")
 const[userRole, setUserRole] = useState<string>("")
 const[successfullySubmittedForm, setSuccessfullySubmittedForm] = useState<boolean>(false)
+const[signUpMessage, setSignUpMessage] = useState<string>("")
+const[error, setError] = useState<string | null>(null)
 const [newUser, setNewUser] = useState({
     firstName: "",
     lastName: "",
@@ -16,9 +18,29 @@ const [newUser, setNewUser] = useState({
     role: "",
   });
 
+const handleFindUser = async (email:string) => {
+        try {
+            await userApi.getUserByEmail(email);
+            setError("Email existed ❌")
+        } catch (err) {
+            console.log(err);
+            setError(null)
+        }
+    };
+
 const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}":;'?/>.<,]).{8,}$/;
     
+    if(!passwordRegex.test(newUser.password)){
+      setSignUpMessage("Password must be at least 8 characters, contain 1 uppercase letter, and 1 special character ❌");
+      return;
+    }
+    else{
+      setSignUpMessage("")
+    }
+
     if (newUser.password !== confirmPassword) {
       alert("Passwords do not match. Please try again.");
       return;
@@ -90,7 +112,14 @@ else{
             placeholder='example@email.com' 
             pattern="/^[a-zA-Z0-9.!#$%&'+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$/" 
             onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+            onBlur={(e) => handleFindUser(e.target.value)}
             required></input>
+
+            {error && (
+                <p className={`text-lg text-center max-w-xs font-semibold text-red-500 ${error}`}>
+                    {error}
+                </p>
+            )}
 
             <input placeholder="New Password"className="border-2 rounded-md border-blue-600 text-lg p-1 w-full"
             type="password" 
@@ -98,6 +127,12 @@ else{
             minLength={8}
             onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
             required></input>
+
+            {signUpMessage && (
+                <p className={`text-lg text-center max-w-xs font-semibold ${signUpMessage.includes("❌") ? "text-red-500" : "text-green-600"}`}>
+                    {signUpMessage}
+                </p>
+            )}
 
             <input placeholder="Confirm Password" className="border-2 rounded-md border-blue-600 text-lg p-1 w-full"
             type="password" 
@@ -142,8 +177,13 @@ else{
                 required></input>Lecturer</label>
 
             </div>
-            <button className="text-{6vh} text-white p-1 hover:cursor-pointer bg-blue-600 hover:bg-blue-500 rounded-lg text-white w-full text-lg" 
-            type="submit">Submit</button>
+            {error ? 
+              <button className="text-{6vh} text-white p-1 hover:cursor-pointer bg-red-600 rounded-lg text-white w-full text-lg">Submit</button>
+             : 
+              <button className="text-{6vh} text-white p-1 hover:cursor-pointer bg-blue-600 hover:bg-blue-500 rounded-lg text-white w-full text-lg" 
+              type="submit">Submit</button>
+            }
+            
         </form>
     </div>
     </div>
