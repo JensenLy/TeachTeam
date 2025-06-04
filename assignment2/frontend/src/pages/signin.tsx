@@ -23,8 +23,6 @@
         role: "",
     });
 
-
-
     const handleFindUser = async (email:string) => {
         try {
             const data = await userApi.getUserByEmail(email);

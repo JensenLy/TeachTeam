@@ -1,4 +1,5 @@
 import axios from "axios";
+import { AxiosError } from "axios";
 
 export const api = axios.create({
   baseURL: "http://localhost:3001/api", 
@@ -51,11 +52,17 @@ export const userApi = {
   },
 
   verifyPassword: async (email: string, password: string) => {
+    try {
     const response = await api.post("/users/verify", { email, password });
     return response.data;
-  },
-
-};
+    } catch (error) {
+          if(axios.isAxiosError(error) && error.response?.status === 401) { 
+            return false;
+          }
+      } 
+        throw new Error("An unexpected error occurred");
+    },
+  };
 
 export const courseApi = {
   getAllCourses: async () => {
