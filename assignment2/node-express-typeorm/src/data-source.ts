@@ -1,6 +1,9 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { User } from "./entity/User";
+import { Applications } from "./entity/Applications";
+import { Job } from "./entity/Jobs";
+import { Comment } from "./entity/Comment";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -14,7 +17,7 @@ export const AppDataSource = new DataSource({
   // but should be disabled in production to prevent accidental data loss.
   synchronize: true,
   logging: true,
-  entities: [User],
+  entities: [User, Applications, Comment, Job],
   migrations: [],
   subscribers: [],
 });
