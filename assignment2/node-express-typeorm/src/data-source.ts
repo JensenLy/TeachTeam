@@ -2,7 +2,7 @@ import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { User } from "./entity/User";
 import { Applications } from "./entity/Applications";
-import { Courses, Job } from "./entity/Courses";
+import { Courses } from "./entity/Courses";
 import { Comment } from "./entity/Comment";
 import { CandidateProfile } from "./entity/CandidateProfile";
 import { LecturerProfile } from "./entity/LecturerProfile";
