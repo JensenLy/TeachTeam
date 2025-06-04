@@ -2,8 +2,10 @@ import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { User } from "./entity/User";
 import { Applications } from "./entity/Applications";
-import { Job } from "./entity/Courses";
+import { Courses, Job } from "./entity/Courses";
 import { Comment } from "./entity/Comment";
+import { CandidateProfile } from "./entity/CandidateProfile";
+import { LecturerProfile } from "./entity/LecturerProfile";
 
 export const AppDataSource = new DataSource({
   type: "mysql",
@@ -17,7 +19,7 @@ export const AppDataSource = new DataSource({
   // but should be disabled in production to prevent accidental data loss.
   synchronize: true,
   logging: true,
-  entities: [User, Applications, Comment, Job],
+  entities: [User, Applications, Comment, Courses, CandidateProfile, LecturerProfile],
   migrations: [],
   subscribers: [],
 });
