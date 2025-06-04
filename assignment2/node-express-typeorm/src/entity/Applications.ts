@@ -7,6 +7,7 @@ import {
   OneToMany,
   JoinColumn,
   OneToOne,
+  ManyToOne,
 } from "typeorm";
 
 import { Comment } from "./Comment";
@@ -22,23 +23,20 @@ export class Applications {
   @Column({default: "pending"})
   status: string;
   // user foregin key
-  
-  @CreateDateColumn()
-  appliedAt: Date;
 
   @Column()
-  availability: Date;
+  availability: String;
 
   @Column()
-  skills: Date;
+  skills: String;
 
   @Column()
-  academic: Date;
+  academic: String;
 
-  @Column()
-  prevRoles: Date;
+  @Column({ nullable: true })
+  prevRoles: String;
 
-  @OneToOne(() => CandidateProfile, candidate => candidate.application)
+  @ManyToOne(() => CandidateProfile, (candidate: CandidateProfile) => candidate.application)
   @JoinColumn({ name: "candidateId" })
   candidate: CandidateProfile;
 
@@ -49,4 +47,7 @@ export class Applications {
   @OneToMany(() => Comment, comment => comment.application)
   @JoinColumn({ name: "commentsId" })
   comments: Comment[];
+
+  @CreateDateColumn()
+  appliedAt: Date;
 }

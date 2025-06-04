@@ -25,6 +25,15 @@ export interface Course {
   requirement: string,
 }
 
+export interface Application {
+  candidateId: number,
+  courseId: number,
+  availability: string,
+  skills: string,
+  academic: string,
+  prevRoles: string,
+}
+
 export const userApi = {
   getAllUsers: async () => {
     const response = await api.get("/users");
@@ -64,9 +73,40 @@ export const userApi = {
     },
   };
 
+export const candidateApi = {
+  getAllCandidate: async () => {
+    const response = await api.get("/candidate");
+    return response.data;
+  },
+
+  getCandidateByUserID: async (user: User) => {
+    const response = await api.get(`/candidate/${user.id}`);
+    return response.data;
+  },
+};
+
 export const courseApi = {
   getAllCourses: async () => {
     const response = await api.get("/courses");
+    return response.data;
+  },
+
+  getCoursesByID: async (id:number) => {
+    const response = await api.get(`/courses/${id}`);
+    return response.data;
+  },
+};
+
+export const applicationApi = {
+  getAllApps: async () => {
+    const response = await api.get("/apps");
+    return response.data;
+  },
+
+  createApp: async (application: Partial<Application>) => {
+    console.log("before 100")
+    const response = await api.post(`/apps`, application);
+    console.log("after 100")
     return response.data;
   },
 };

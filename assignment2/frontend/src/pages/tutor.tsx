@@ -7,7 +7,7 @@ import { useContext } from "react";
 import { loginContext, LoginContextType } from "@/contexts/LoginContext";
 import { JobInfo } from '../types/jobInfo';
 import SuccessScreen from '@/components/successScreen';
-import { courseApi, Course } from "../services/api";
+import { courseApi, Course, candidateApi, userApi, Application, applicationApi } from "../services/api";
 
 export default function Tutor() {
     
@@ -17,11 +17,9 @@ export default function Tutor() {
     const[userAvailability, setUserAvailability] = useState<string>("")
     const[successfullySubmittedForm, setSuccessfullySubmittedForm] = useState<boolean>(false)
     const[screenState, setScreenState] = useState<boolean>(true)
-    const[courseCodeAppliedTo, setcourseCodeAppliedTo] = useState<string>("")
     const context = useContext(loginContext) as LoginContextType;
 
     const [error, setError] = useState<string | null>(null);
-    
     const [course, setCourse] = useState({
         courseId: 0,
         title: "",
@@ -46,109 +44,45 @@ export default function Tutor() {
 
     useEffect(() => {fetchCourses()}, [])
 
-    interface ApplicationData{
-        firstName: string
-        lastName: string
-        email: string
-        skill: string
-        academic: string
-        prevRoles?: string //optional
-        userAvailability: string,
-        courseName: string
-        count: number
-        comment: string[]
-    }
-
-    const Job1 : JobInfo = {
-        courseTitle: "C++ Programming Studio",
-        courseCode: "COSC2804",
-        location: "Melbourne CBD",
-        description: "C++ Programming Studio is an intermediate studio-based course that focuses on the further acquisition and development of technical and professional skills for computing. The studio-based approach provides an authentic problem setting where theory and practice of computer architecture are blended. In this course you will develop programming principles, skills and practices for modern software development, continuing the study of design, development and testing from previous courses. These learning outcomes will be achieved by developing a medium-sized real-world application.",
-        requirement: "COSC2802 C++ Programming Bootcamp (Course ID 054080)",
-        dayPosted: 1,
-    }
-
-    const Job2 : JobInfo  = {
-        courseTitle: "C++ Programming Bootcamp",
-        courseCode: "COSC2802",
-        location: "Melbourne CBD",
-        description: "C++ Programming Bootcamp builds on Java Programming Bootcamp, in a bootcamp style, i.e. in a focussed mode over a period of 5 or 6 weeks. This course covers more advanced algorithms. This course serves as a pre-requisite for more specialized courses that require programming.",
-        requirement: "COSC2801 Java Programming Bootcamp (Course ID 054079)",
-        dayPosted: 6,
-    }
-
-    const Job3 : JobInfo  = {
-        courseTitle: "Algorithms and Analysis",
-        courseCode: "COSC2123",
-        location: "Melbourne CBD",
-        description: "The main objective of this course is for you to acquire the tools and techniques necessary to propose practical algorithmic solutions to real-world problems which still allow strong theoretical bounds on time and space usage. You will study a broad variety of important and useful algorithms and data structures in different areas of applications, and will concentrate on fundamental algorithms. You will spend a significant time on each algorithm to understand its essential characteristics and to respect its subtleties.",
-        requirement: "COSC2288 / COSC2391 / COSC2440 / COSC2684 / COSC2786 - Further Programming (Course ID 014052) OR COSC2802 - Programming Bootcamp 2 (Course ID 054080) OR COSC1076 / COSC2082 / COSC2136 / COSC2696 - Advanced Programming Techniques (Course ID 004068) OR COSC2800 -  IT Studio 2 (Course ID 054075) OR EEET2482 - Software Engineering Design (Course ID 038296) OR MATH2393- Engineering Mathematics (Course ID 054543)",
-        dayPosted: 4,
-    }
-
-    const Job4 : JobInfo  = {
-        courseTitle: "Full Stack Development",
-        courseCode: "COSC2390",
-        location: "Bundoora Campus",
-        description: "Full Stack Development provides a range of enabling skills for independent development of small to medium-scale industry standard web applications. These skills will equip you to be ready for commercial development and to meet the demand of small to medium sized organisations such as start-ups, small businesses, and other ventures.",
-        requirement: "No Prerequisites",
-        dayPosted: 17,
-    }
-
-    const Job5 : JobInfo  = {
-        courseTitle: "Math For Computing 1",
-        courseCode: "COSC9301",
-        location: "Melbourne CBD",
-        description: "Mathematics for Computing 1 provides a foundation for Computer Science. Many other areas of Computer Science require the ability to work with concepts from discrete structures, which include topics such asset theory, integers, functions, relations, logic, proofs, and graph theory. The material in discrete structures is pervasive in the areas of data structures and algorithms but appears elsewhere in Computer Science as well.",
-        requirement: "No Prerequisites",
-        dayPosted: 7,
-    }
-
-    const Job6 : JobInfo  = {
-        courseTitle: "Software Engineering Fundamentals",
-        courseCode: "COSC9921",
-        location: "Bundoora Campus",
-        description: "This course is designed to provide you opportunity to gain knowledge and skills necessary to analyse, design and implement complex software engineering projects.",
-        requirement: "No Prerequisites",
-        dayPosted: 11,
-    }
-
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); //prevent the browser from refreshing
-        
-        //take the name and email from sign in/up data, the others from the input field. 
-        const userSignUpData: ApplicationData = {
-          firstName: context.firstNameLogedIn,
-          lastName: context.lastNameLogedIn,
-          email: context.emailLogedIn,
-          skill: skill,
-          academic: academic,
-          prevRoles: prevRoles,
-          userAvailability: userAvailability,
-          courseName: courseCodeAppliedTo, //take course name from swapScreen
-          count: 0,    //initialise the vote count
-          comment: []  //initialise the comment array 
-        }   
+
+        createApplication();
 
         setPrevRoles("") //clear prevRoles when submitting 
-        
-        //get data from local storage, set it to an empty array if null
-        const existingApplications: ApplicationData[] = JSON.parse((localStorage.getItem("ApplicationData") || "[]" ))
-        existingApplications.push(userSignUpData) //add the new submission to the array 
-        
-        //save it back to local storage 
-        localStorage.setItem("ApplicationData", JSON.stringify(existingApplications))
+
         setSuccessfullySubmittedForm(true) //this is used to trigger the "congrats" screen 
     }
 
     // swap (or switch or whatever) between the jobs card and the form 
-    const swapScreen = (e: React.MouseEvent<HTMLButtonElement>, programCode?: string, type?:string) => {    
+    const swapScreen = (e: React.MouseEvent<HTMLButtonElement>, index?: number) => {    
         e.preventDefault(); //same as above, prevent refreshing 
-        if(typeof programCode !== "undefined"){ //set the program code for the form if there's none 
-            setcourseCodeAppliedTo(programCode)
+        if(typeof index !== "undefined"){ //set the program code for the form if there's none 
+            setCourse(courses[index])
         }
         setScreenState(!screenState); //swap back and forth between screens (false is the job cards, true is the form)
     }
+
+    const createApplication = async () => {
+        try {
+            const user = await userApi.getUserByEmail(context.emailLogedIn);
+            const candidate = await candidateApi.getCandidateByUserID(user);
+            const candidateId = candidate.id;
+
+            const application: Application = {
+            candidateId,
+            courseId: course.courseId,
+            availability: userAvailability,
+            skills: skill,
+            academic: academic,
+            prevRoles: prevRoles,
+            };
+            console.log(application)
+            await applicationApi.createApp(application);
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     return (
         <>
@@ -158,13 +92,13 @@ export default function Tutor() {
             <div className={styles.mainContent}>
                 {screenState ? (//swapScreen changes screenState which is used for this
                 <>
-                {courses.map((course) => (
+                {courses.map((course, index) => (
                     <div className={styles.container}>
                         <ul className = {styles.jobCard}>
                             <li><h2>{course.title} - {course.type}</h2></li>
 
                             {/* trigger the swap screen in this button, will be the same for other jobs below */}
-                            <button className="bg-blue-500 hover:bg-sky-700" type="button" onClick={(e) => {swapScreen(e, course.title, course.type)}}>Apply Now!</button>
+                            <button className="bg-blue-500 hover:bg-sky-700" type="button" onClick={(e) => {swapScreen(e, index)}}>Apply Now!</button>
 
                             <li>
                                 <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#7f8992"><path d="M520-120v-80h80v80h-80Zm-80-80v-200h80v200h-80Zm320-120v-160h80v160h-80Zm-80-160v-80h80v80h-80Zm-480 80v-80h80v80h-80Zm-80-80v-80h80v80h-80Zm360-280v-80h80v80h-80ZM180-660h120v-120H180v120Zm-60 60v-240h240v240H120Zm60 420h120v-120H180v120Zm-60 60v-240h240v240H120Zm540-540h120v-120H660v120Zm-60 60v-240h240v240H600Zm80 480v-120h-80v-80h160v120h80v80H680ZM520-400v-80h160v80H520Zm-160 0v-80h-80v-80h240v80h-80v80h-80Zm40-200v-160h80v80h80v80H400Zm-190-90v-60h60v60h-60Zm0 480v-60h60v60h-60Zm480-480v-60h60v60h-60Z"/></svg>
@@ -206,16 +140,19 @@ export default function Tutor() {
                         </div>
                             <textarea placeholder="Describe your skills" className="flex-1 border-2 rounded-md border-blue-600 text-lg p-1 w-full"
                             name="skill" 
+                            maxLength={250}
                             onChange={(e) => {setSkill(e.target.value)}} //updates the value on typing, same for the other textarea. 
                             required></textarea>
 
                             <textarea placeholder="Academic Credentials" className="flex-1 border-2 rounded-md border-blue-600 text-lg p-1 w-full"
                             name="academic" 
+                            maxLength={250}
                             onChange={(e) => {setAcademic(e.target.value)}}
                             required></textarea>
 
                             <textarea placeholder="Previous Roles (Optional)" className="flex-1 border-2 rounded-md border-blue-600 text-lg p-1 w-full"
                             name="prevRoles" 
+                            maxLength={250}
                             onChange={(e) => {setPrevRoles(e.target.value)}}></textarea>
 
                             <h2 className="text-lg">Select your availability:</h2>

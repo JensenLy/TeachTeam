@@ -11,4 +11,17 @@ export class courseCtrl {
     return response.json(course);
   }
 
+  async one(request: Request, response: Response) {
+    const temp = request.params.id;
+    const id = parseInt(temp);
+    const course = await this.CourseRepository.findOne({
+      where: { courseId: id }
+    });
+
+    if (!course) {
+      return response.status(404).json({ message: "Course not found" });
+    }
+    return response.json(course);
+  }
+
 }
