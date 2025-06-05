@@ -65,18 +65,21 @@ export default function Tutor() {
 
     const createApplication = async () => {
         try {
-            const user = await userApi.getUserByEmail(context.emailLogedIn);
+            const user = await userApi.getUserByEmail(context.emailLoggedIn);
+
             const candidate = await candidateApi.getCandidateByUserID(user);
+
             const candidateId = candidate.id;
 
             const application: Application = {
             candidateId,
             courseId: course.courseId,
-            availability: userAvailability,
             skills: skill,
             academic: academic,
             prevRoles: prevRoles,
+            availability: userAvailability,
             };
+            
             console.log(application)
             await applicationApi.createApp(application);
         } catch (err) {

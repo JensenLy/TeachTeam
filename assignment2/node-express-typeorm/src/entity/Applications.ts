@@ -40,7 +40,7 @@ export class Applications {
   @JoinColumn({ name: "candidateId" })
   candidate: CandidateProfile;
 
-  @OneToOne(() => Courses, courses => courses.applications)
+  @ManyToOne(() => Courses, courses => courses.applications)
   @JoinColumn({ name: "courseId" })
   courses: Courses;
 
