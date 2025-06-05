@@ -2,6 +2,8 @@ import React, { use } from "react";
 import { LoginContext, LoginContextType } from "@/contexts/LoginContext";
 import { useState, useEffect } from "react";
 import { userApi, User } from "../services/api";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 
 export default function Profile() {
     const {emailLoggedIn, setEmailLoggedIn} = React.useContext(LoginContext) as LoginContextType;
@@ -63,6 +65,8 @@ export default function Profile() {
     if (error) return <div className="text-red-500">{error}</div>;
 
     return (
+        <div>
+            <Header/>
             <div className="grid gap-4  items-center pt-8 ">
                 <div className="p-4 border rounded flex justify-center bg-blue-100">
                     {user.id !== undefined && editingUserId === user.id ? (
@@ -141,5 +145,7 @@ export default function Profile() {
                     )}
                 </div>
             </div>
+        </div>
+
     );
 }
