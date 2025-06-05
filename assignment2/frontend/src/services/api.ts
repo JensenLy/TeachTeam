@@ -106,9 +106,18 @@ export const applicationApi = {
   },
 
   createApp: async (application: Partial<Application>) => {
-    console.log("before 100")
     const response = await api.post(`/apps`, application);
-    console.log("after 100")
     return response.data;
   },
+
+  hasApplied: async (candidateId: number, courseId: number): Promise<boolean> => {
+    try{
+      const response = await api.get(`/apps/check/${candidateId}/${courseId}`)
+      return response.data.hasApplied;
+    } catch (error){
+      return false;
+    }
+  }
+
+
 };

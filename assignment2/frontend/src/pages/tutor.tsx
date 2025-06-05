@@ -71,6 +71,13 @@ export default function Tutor() {
 
             const candidateId = candidate.id;
 
+            const alreadyApplied = await applicationApi.hasApplied(candidateId, course.courseId)
+            
+            if(alreadyApplied){
+                alert("You have already applied for this course")
+                return;
+            }
+
             const application: Application = {
             candidateId,
             courseId: course.courseId,
@@ -79,7 +86,7 @@ export default function Tutor() {
             prevRoles: prevRoles,
             availability: userAvailability,
             };
-            
+
             console.log(application)
             await applicationApi.createApp(application);
         } catch (err) {

@@ -55,4 +55,26 @@ export class ApplicationCtrl {
             .json({ message: "Error creating application", error });
         }
     }
-}
+
+  async hasApplied(request: Request, response: Response){
+    const { candidateId, courseId } = request.params;
+
+    try{
+      const existingApp = await this.AppRepository.findOne({
+        where: {
+          candidate: {id: Number(candidateId)},
+          courses: {courseId: Number(courseId)},
+        },
+        relations: ["candidate", "courses"],
+      });
+
+      if(existingApp){
+        return response.status(200).json({ hasApplied: true });
+      }
+      
+      return response.status(200).json({hasApplied: false})
+    } catch(error){
+      return response.status(500).json({ message: "Internal server error" });
+    }
+  }
+  }
