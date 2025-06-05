@@ -4,7 +4,7 @@
     import { useState } from "react"
     import { useRouter } from "next/router"
     import { useContext } from "react";
-    import { loginContext, LoginContextType } from "@/contexts/LoginContext";
+    import { LoginContext, LoginContextType } from "@/contexts/LoginContext";
     import { userApi } from "../services/api";
     import argon2 from "argon2";
     // a list of users which are 3 tutors and 3 lecturers
@@ -13,7 +13,7 @@
     const[email, setEmail] = useState<string>("")
     const[password, setPassword] = useState<string>("")
     const[loginMessage, setLoginMessage] = useState<string>("")
-    const{setIsLoggedIn, setFirstNameLogedIn, setEmailLogedIn, setLastNameLogedIn, setUserRole} = useContext(loginContext) as LoginContextType;
+    const{setIsLoggedIn, setFirstNameLoggedIn, setEmailLoggedIn, setLastNameLoggedIn, setUserRole} = useContext(LoginContext) as LoginContextType;
     const router = useRouter()
     const [user, setUser] = useState({
         firstName: "",
@@ -27,8 +27,8 @@
         try {
             const data = await userApi.getUserByEmail(email);
             setUser(data);
+            return data;
         } catch (err) {
-            console.log(err);
             setUser({firstName: "", lastName: "", email: "", password:"", role: ""})
         }
     };
@@ -37,7 +37,7 @@
         e.preventDefault();
         
         //find user 
-        handleFindUser(email)
+        const foundUser = await handleFindUser(email)
 
         //min 8 characters, 1 capital letter, and 1 special character
         const passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}":;'?/>.<,]).{8,}$/;
@@ -48,7 +48,7 @@
             return;
         }
         
-        if(!user.email){
+        if(!foundUser || !foundUser.email){
             setLoginMessage("Email not found ❌");
             return;
         }
@@ -57,9 +57,9 @@
 
         if(isValidPassword){
             setIsLoggedIn(true)
-            setFirstNameLogedIn(user.firstName)
-            setLastNameLogedIn(user.lastName)
-            setEmailLogedIn(email)
+            setFirstNameLoggedIn(user.firstName)
+            setLastNameLoggedIn(user.lastName)
+            setEmailLoggedIn(email)
             setUserRole(user.role)
 
             if(user.role === "candidate"){

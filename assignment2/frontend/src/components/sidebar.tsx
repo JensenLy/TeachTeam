@@ -1,6 +1,6 @@
 import styles from "../styles/sidebar.module.css"
 import React, { useState } from 'react';
-import { loginContext, LoginContextType } from "@/contexts/LoginContext";
+import { LoginContext, LoginContextType } from "@/contexts/LoginContext";
 import { useContext } from "react";
 import { useRouter } from 'next/router';
 import Link from "next/link";
@@ -9,18 +9,18 @@ export default function Sidebar() {
     const router = useRouter();
     const currentPath = router.pathname;
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-    const {setIsLoggedIn, userRole, firstNameLogedIn} = useContext(loginContext) as LoginContextType
+    const {setIsLoggedIn, userRole, firstNameLoggedIn} = useContext(LoginContext) as LoginContextType
     const toggleSidebar = () => {
         setIsSidebarCollapsed(prevState => !prevState);
     };
 
     let greeting:string = ""; 
     // if fitstNameLogedIn is set to be null or undefined the fall back is welcome back!
-    if (!firstNameLogedIn){ 
+    if (!firstNameLoggedIn){ 
         greeting = "Welcome back!"
     }
     else { 
-        greeting = "Hi, " + firstNameLogedIn + "!"
+        greeting = "Hi, " + firstNameLoggedIn + "!"
     }
 
     let isTutor:boolean = true; 

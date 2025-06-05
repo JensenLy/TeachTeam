@@ -2,11 +2,12 @@ import Image from "next/image";
 import { useState } from "react";
 import Link from "next/link";
 import { useContext } from "react";
-import { loginContext, LoginContextType } from "@/contexts/LoginContext";
+import { LoginContext } from "@/contexts/LoginContext";
+import { LoginContextType } from "@/contexts/LoginContext";
 
 export default function Header(){
 const [isOpen, setIsOpen] = useState(false);
-const{isLoggedIn, setIsLoggedIn, userRole } = useContext(loginContext) as LoginContextType;
+const{isLoggedIn, setIsLoggedIn, userRole } = useContext(LoginContext) as LoginContextType;
 
 return (
     <header className="flex-1 w-full text-white bg-blue-500 justify-center p-7"> 

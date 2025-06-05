@@ -1,12 +1,12 @@
 import React from "react";
 import { useContext } from "react";
-import { loginContext } from "@/contexts/LoginContext";
+import { LoginContext } from "@/contexts/LoginContext";
 import { LoginContextType } from "@/contexts/LoginContext";
 import Link from "next/link";
 
 export default function Footer() {
-  const{isLoggedIn} = useContext(loginContext) as LoginContextType;
-  const{setIsLoggedIn} = useContext(loginContext) as LoginContextType;
+  const{isLoggedIn} = useContext(LoginContext) as LoginContextType;
+  const{setIsLoggedIn} = useContext(LoginContext) as LoginContextType;
 
   return (
     <footer className="w-full mt-auto bg-blue-500 border-t-0 border-white flex items-center justify-center">
