@@ -4,7 +4,7 @@ import Header from "../components/header"
 import Footer from "../components/footer";
 import Sidebar from "../components/sidebar";
 import { useContext } from "react";
-import { loginContext, LoginContextType } from "@/contexts/LoginContext";
+import { LoginContext, LoginContextType } from "@/contexts/LoginContext";
 
 export default function Lecturer() {
     
@@ -12,7 +12,7 @@ const[comment, setComment] = useState<Record<number, string>>({});
 const[sentComment, setSentComment] = useState<{ [index: number]: string[] }>({});
 // const[chosenCandidates, setChosenCandidates] = useState<{ [index: number]: boolean }>({});
 const[candidateArray, setCandidateArray] = useState<ApplicationData[]>([]);
-const{lastNameLogedIn, firstNameLogedIn} = useContext(loginContext) as LoginContextType;
+const{lastNameLoggedIn, firstNameLoggedIn} = useContext(LoginContext) as LoginContextType;
 
 interface ApplicationData{
     firstName: string
@@ -32,9 +32,9 @@ interface ApplicationData{
         //seperated by a delimiter: "/|theBestDelimiter/|" (which will be used later for split)
 
         //save the comment with name 
-        const newComment = `${firstNameLogedIn} ${lastNameLogedIn}/|theBestDelimiter/|${comment[index]}` || "";
+        const newComment = `${firstNameLoggedIn} ${lastNameLoggedIn}/|theBestDelimiter/|${comment[index]}` || "";
         
-        if (newComment !== `${firstNameLogedIn} ${lastNameLogedIn}/|theBestDelimiter/|`) { //check if the comment is not blank or null 
+        if (newComment !== `${firstNameLoggedIn} ${lastNameLoggedIn}/|theBestDelimiter/|`) { //check if the comment is not blank or null 
             
             setSentComment(prev => { //add new comment to the list at that index
                 return {
@@ -59,7 +59,7 @@ interface ApplicationData{
                 //save it back to local storage
                 localStorage.setItem("ApplicationData", JSON.stringify(candidates)); 
 
-                const email = localStorage.getItem("emailLogedIn") || "[]"; //get email
+                const email = localStorage.getItem("emailLoggedIn") || "[]"; //get email
                 //get lecturer's chosen candidates from local storage
                 const storedLecturer: ApplicationData[] =  JSON.parse(localStorage.getItem(email) || "{}");
 
@@ -86,7 +86,7 @@ interface ApplicationData{
           if (updated[index]) { //check if that candidate exists (they should)
             updated[index].preference = newPreference; //update the new preference number at that index
             
-            const email = localStorage.getItem("emailLogedIn") || "[]"; //get email 
+            const email = localStorage.getItem("emailLoggedIn") || "[]"; //get email 
             const storedLecturer = JSON.parse(localStorage.getItem(email) || "[]"); //get lecturer's data 
             if (Array.isArray(storedLecturer)) {    
               storedLecturer[index].preference = newPreference; //also update the new preference number to the storedLecturer 
@@ -98,7 +98,7 @@ interface ApplicationData{
       };
 
     useEffect(() => {
-        const email = localStorage.getItem("emailLogedIn") || "[]"; //get email 
+        const email = localStorage.getItem("emailLoggedIn") || "[]"; //get email 
         const storedLecturer: ApplicationData[] = JSON.parse(localStorage.getItem(email) || "{}"); //get lecturer's data 
     
         if (storedLecturer && Array.isArray(storedLecturer)) { //check if storedLecturer exists and is an array 
