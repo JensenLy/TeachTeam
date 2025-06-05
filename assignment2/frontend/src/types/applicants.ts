@@ -9,5 +9,6 @@ export type Applicant = {
     courseName: string
     count: number
     status: number
-    comment: string[]
+    applicationId: number
+    chosenBy: string
 }

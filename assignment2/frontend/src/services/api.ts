@@ -117,7 +117,10 @@ export const applicationApi = {
     } catch (error){
       return false;
     }
+  },
+
+  updateCount: async (applicationId: number, count: number, chosenBy: string) => {
+    const response = await api.put(`/applications/${applicationId}/count`, { count, chosenBy });
+    return response.data;
   }
-
-
 };

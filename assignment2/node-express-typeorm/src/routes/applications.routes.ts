@@ -16,5 +16,8 @@ router.get("/apps/check/:candidateId/:courseId", async (req, res) => {
   await AppCtrl.hasApplied(req, res);
 });
 
+router.put("/applications/:id/count", async (req, res) => {
+  await AppCtrl.updateCount(req, res);
+});
 
 export default router;

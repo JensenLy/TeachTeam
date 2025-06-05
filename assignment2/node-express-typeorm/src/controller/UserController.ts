@@ -29,9 +29,9 @@ export class UserController {
    */
   async one(request: Request, response: Response) {
     const email = request.params.email;
-    const pass = request.params.password
     const user = await this.userRepository.findOne({
-      where: { email: email, password: pass},
+      relations: {lecturerProfile: true},
+      where: {email: email},
     });
 
     if (!user) {
@@ -81,9 +81,7 @@ export class UserController {
 
       return response.status(201).json(savedUser);
     } catch (error) {
-      return response
-        .status(400)
-        .json({ message: "Error creating user", error });
+      return response.status(400).json({ message: "Error creating user", error });
     }
   }
 
@@ -157,9 +155,7 @@ export class UserController {
       const updatedUser = await this.userRepository.save(userToUpdate);
       return response.json(updatedUser);
     } catch (error) {
-      return response
-        .status(400)
-        .json({ message: "Error updating user", error });
+      return response.status(400).json({ message: "Error updating user", error });
     }
   }
 }

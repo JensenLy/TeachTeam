@@ -20,9 +20,11 @@ export class Applications {
   @PrimaryGeneratedColumn()
   applicationId: number;
 
-  @Column({default: "pending"})
-  status: string;
-  // user foregin key
+  @Column({default: ""})
+  chosenBy: string;
+
+  @Column({default: 0})
+  count: number;
 
   @Column()
   availability: String;

@@ -11,7 +11,15 @@ export class ApplicationCtrl {
   private CourseRepo = AppDataSource.getRepository(Courses);
 
   async all(request: Request, response: Response) {
-    const application = await this.AppRepository.find();
+    const application = await this.AppRepository.find({
+      relations: {
+        candidate: {
+          user: true,
+        },
+        courses: true,
+      },
+      
+    });
 
     return response.json(application);
   }
@@ -37,7 +45,7 @@ export class ApplicationCtrl {
           }
         
           const app = new Applications();
-          app.status = status ?? "pending";
+          app.chosenBy;
           app.availability = availability;
           app.skills = skills;
           app.academic = academic;
@@ -50,9 +58,7 @@ export class ApplicationCtrl {
           return response.status(201).json(savedApp);
         } catch (error) {
           console.error("Error creating application:", error);
-          return response
-            .status(400)
-            .json({ message: "Error creating application", error });
+          return response.status(400).json({ message: "Error creating application", error });
         }
     }
 
@@ -77,4 +83,28 @@ export class ApplicationCtrl {
       return response.status(500).json({ message: "Internal server error" });
     }
   }
+
+  async updateCount(request: Request, response: Response) {
+    const applicationId = parseInt(request.params.id); // assuming :id is applicationId
+    const { count, chosenBy } = request.body;
+
+    try {
+      const appToUpdate = await this.AppRepository.findOne({
+        where: { applicationId },
+      });
+
+      if (!appToUpdate) {
+        return response.status(404).json({ message: "Application not found" });
+      }
+
+      appToUpdate.count = count;
+      appToUpdate.chosenBy = chosenBy;
+
+      const updatedApp = await this.AppRepository.save(appToUpdate);
+      return response.json(updatedApp);
+    } catch (error) {
+      return response.status(400).json({ message: "Error updating application count", error });
+    }
   }
+
+}
