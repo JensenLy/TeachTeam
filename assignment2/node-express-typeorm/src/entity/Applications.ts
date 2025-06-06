@@ -26,6 +26,14 @@ export class Applications {
   @Column({default: 0})
   count: number;
 
+  @Column({
+  type: "enum",
+  enum: ["Tutor", "Lab Assistance"],
+  default: "Lab Assistance",
+  })
+  role: "Tutor" | "Lab Assistance";
+ 
+
   @Column()
   availability: String;
 

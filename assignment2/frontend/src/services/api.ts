@@ -34,6 +34,7 @@ export interface Application {
   skills: string,
   academic: string,
   prevRoles: string,
+  role: "Tutor" | "Lab Assistance"
 }
 
 export const userApi = {

@@ -85,6 +85,7 @@ export default function Tutor() {
             academic: academic,
             prevRoles: prevRoles,
             availability: userAvailability,
+            role: course.type as "Tutor" | "Lab Assistance",
             };
 
             console.log(application)

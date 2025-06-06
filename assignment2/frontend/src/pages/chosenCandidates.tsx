@@ -6,7 +6,7 @@ import Sidebar from "../components/sidebar";
 import { useContext } from "react";
 import { LoginContext, LoginContextType } from "@/contexts/LoginContext";
 
-export default function Lecturer() {
+export default function chosenCandidates() {
     
 const[comment, setComment] = useState<Record<number, string>>({});
 const[sentComment, setSentComment] = useState<{ [index: number]: string[] }>({});

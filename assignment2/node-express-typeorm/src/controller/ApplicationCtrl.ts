@@ -33,7 +33,8 @@ export class ApplicationCtrl {
         availability,
         skills,
         academic,
-        prevRoles 
+        prevRoles,
+        role
       } = request.body;
   
       try {
@@ -52,6 +53,7 @@ export class ApplicationCtrl {
           app.prevRoles = prevRoles;
           app.candidate = candidate;
           app.courses = course;
+          app.role = role;
 
           const savedApp = await this.AppRepository.save(app);
           
