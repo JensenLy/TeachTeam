@@ -29,6 +29,7 @@ export default function Header() {
                         {isLoggedIn ? (
                             userRole === "lecturer" ? (
                                 <>
+                                    <li><Link className="hover:bg-sky-700 duration-75 rounded-md p-3" href="/profile">Profile</Link></li>
                                     <li><Link className="hover:bg-sky-700 duration-75 rounded-md p-3" href="/lecturer">Lecturer Page</Link></li>
                                     <li><Link className="hover:bg-sky-700 duration-75 rounded-md p-3" onClick={() => setIsLoggedIn(false)} data-testid="lecturer-signOut"
                                         href="/">Sign Out</Link></li>
@@ -56,11 +57,13 @@ export default function Header() {
                         {isLoggedIn ? (
                             userRole === "lecturer" ? (
                                 <>
+                                    <li><Link className="hover:bg-sky-700 duration-75 rounded-md p-3" href="/profile">Profile</Link></li>
                                     <li><Link className="hover:bg-sky-700 duration-75 rounded-md p-3" href="/lecturer">Lecturer Page</Link></li>
                                     <li><Link className="hover:bg-sky-700 duration-75 rounded-md p-3" onClick={() => setIsLoggedIn(false)} href="/">Sign Out</Link></li>
                                 </>
                             ) : (
                                 <>
+                                    <li><Link className="hover:bg-sky-700 duration-75 rounded-md p-3" href="/profile">Profile</Link></li>
                                     <li><Link className="hover:bg-sky-700 duration-75 rounded-md p-3" href="/tutor">Tutor Page</Link></li>
                                     <li><Link className="hover:bg-sky-700 duration-75 rounded-md p-3" onClick={() => setIsLoggedIn(false)} href="/">Sign Out</Link></li>
                                 </>
