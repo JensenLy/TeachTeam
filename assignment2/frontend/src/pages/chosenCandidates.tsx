@@ -5,36 +5,72 @@ import Footer from "../components/footer";
 import Sidebar from "../components/sidebar";
 import { useContext } from "react";
 import { LoginContext, LoginContextType } from "@/contexts/LoginContext";
+import { userApi, applicationApi, commentApi } from "../services/api";
+import { Applicant } from "../types/applicants";
+import App from 'next/app';
 
 export default function chosenCandidates() {
     
 const[comment, setComment] = useState<Record<number, string>>({});
 const[sentComment, setSentComment] = useState<{ [index: number]: string[] }>({});
-// const[chosenCandidates, setChosenCandidates] = useState<{ [index: number]: boolean }>({});
-const[candidateArray, setCandidateArray] = useState<ApplicationData[]>([]);
-const{lastNameLoggedIn, firstNameLoggedIn} = useContext(LoginContext) as LoginContextType;
+const[chosenCandidates, setChosenCandidates] = useState<Applicant[]>([]);
 
-interface ApplicationData{
-    firstName: string
-    lastName: string
-    email: string
-    skill: string
-    academic: string
-    prevRoles: string
-    userAvailability: string
-    courseName: string
-    comment?: string[]
-    preference?: number
-}
+    const fetchChosen = async () => {
+        try {
+            const data = await applicationApi.getAllApps();
+            const email = localStorage.getItem("emailLoggedIn") || "";
+            const lecturer = await userApi.getUserByEmail(email);
+            const lecturerID = lecturer.lecturerProfile?.lecturerId?.toString();
 
-    const handleComment = (index: number) => {
-        //we saved the commenter's name by putting it straight into the comment string,
-        //seperated by a delimiter: "/|theBestDelimiter/|" (which will be used later for split)
+            const chosenApplications: Applicant[] = [];
 
-        //save the comment with name 
-        const newComment = `${firstNameLoggedIn} ${lastNameLoggedIn}/|theBestDelimiter/|${comment[index]}` || "";
+            data.forEach((app: any) => {
+            // Defensive: Ensure chosenBy is a string
+            const chosenList = typeof app.chosenBy === "string" ? app.chosenBy.split(",") : [];
+
+            if (chosenList.includes(lecturerID)) {
+                const appli: Applicant = {
+                firstName: app.candidate?.user?.firstName,
+                lastName: app.candidate?.user?.lastName,
+                email: app.candidate.user?.email,
+                skill: app.skills,
+                academic: app.academic,
+                prevRoles: app.prevRoles,
+                userAvailability: app.availability,
+                courseName: app.courses?.title,
+                count: app.count,
+                status: 0,
+                applicationId: app.applicationId,
+                chosenBy: app.chosenBy
+                };
+                chosenApplications.push(appli);
+            }
+            });
+
+            if (chosenApplications.length > 0) {
+            console.log("Fetched chosen candidates");
+            } else {
+            console.log("No candidates found");
+            }
+
+            // Idempotent: Only set once with fresh data
+            setChosenCandidates(chosenApplications);
+
+        } catch (err) {
+            console.log(err);
+            console.log("Failed to fetch candidates");
+        }
+    };
+
+    const handleComment = async (index: number, applicationId: number) => {
+        const email = localStorage.getItem("emailLoggedIn") || "";
+        const lecturer = await userApi.getUserByEmail(email);
+        const lecturerID = lecturer.lecturerProfile?.lecturerId;
+
+        //save the comment
+        const newComment = comment[index] || "";
         
-        if (newComment !== `${firstNameLoggedIn} ${lastNameLoggedIn}/|theBestDelimiter/|`) { //check if the comment is not blank or null 
+        if (newComment !== '') { //check if the comment is not blank or null 
             
             setSentComment(prev => { //add new comment to the list at that index
                 return {
@@ -43,89 +79,69 @@ interface ApplicationData{
                 };
             });
         
-            //Get applicants' data from local storage
-            const candidates = JSON.parse(localStorage.getItem("ApplicationData") || "{}");
-        
-            if (
-                //check if the candidates at that index exists 
-                candidates[index] 
-            ) {
-                //check if there's any comment value (it is optional in the interface), if not initialise with an empty array
-                if (!candidates[index].comment) { 
-                    candidates[index].comment = [];
-                }
-                //add new comment to the array
-                candidates[index].comment.push(newComment); 
-                //save it back to local storage
-                localStorage.setItem("ApplicationData", JSON.stringify(candidates)); 
-
-                const email = localStorage.getItem("emailLoggedIn") || "[]"; //get email
-                //get lecturer's chosen candidates from local storage
-                const storedLecturer: ApplicationData[] =  JSON.parse(localStorage.getItem(email) || "{}");
-
-                //same process as above but this time save to the lecuter's data on local storage 
-                if (storedLecturer[index]) {   
-                    if (!storedLecturer[index].comment) {
-                        storedLecturer[index].comment = [];
-                    }
-                    storedLecturer[index].comment.push(newComment);
-                    
-                    //send the newly updated lecturer data to local storage
-                    localStorage.setItem(email, JSON.stringify(storedLecturer));  
-                }
+            try {
+                await commentApi.createComment(newComment, applicationId, lecturerID)
+            } catch (err) {
+                console.error("Failed to update backend:", err);
             }
-    
+            
+            
             // clear textarea after submit 
             setComment(prev => ({ ...prev, [index]: "" }));
+            loadComments()
         }
     };
 
-    const handlePreference = (index: number, newPreference: number) => {
-        setCandidateArray(prev => { //updating the candidateArray
-          const updated = [...prev]; //clone the current state array
-          if (updated[index]) { //check if that candidate exists (they should)
-            updated[index].preference = newPreference; //update the new preference number at that index
-            
-            const email = localStorage.getItem("emailLoggedIn") || "[]"; //get email 
-            const storedLecturer = JSON.parse(localStorage.getItem(email) || "[]"); //get lecturer's data 
-            if (Array.isArray(storedLecturer)) {    
-              storedLecturer[index].preference = newPreference; //also update the new preference number to the storedLecturer 
-              localStorage.setItem(email, JSON.stringify(storedLecturer)); //save it to lecturer's data on local storage
-            }
-          }
-          return updated;
+    const loadComments = async () => {
+        try {
+        const allComments = await commentApi.getAllComments();
+
+        const commentMap: { [index: number]: string[] } = {};
+
+        // Group by applicationId
+        allComments.forEach((cmt: any) => {
+            const appId = cmt.application?.applicationId;
+
+            if (!commentMap[appId]) commentMap[appId] = [];
+
+            // Construct comment string with name delimiter
+            const commenter = `${cmt.lecturer?.user?.firstName} ${cmt.lecturer?.user?.lastName}`;
+            const commentTime = `${cmt.createdAt}`
+            commentMap[appId].push(`${commenter}/|theBestDelimiter/|${cmt.content}/|theBestDelimiter/|${commentTime}`);
         });
-      };
+
+        setSentComment(commentMap);
+        } catch (err) {
+        console.error("Failed to fetch comments:", err);
+        }
+    };
+
+    // const handlePreference = (index: number, newPreference: number) => {
+    //     setCandidateArray(prev => { //updating the candidateArray
+    //       const updated = [...prev]; //clone the current state array
+    //       if (updated[index]) { //check if that candidate exists (they should)
+    //         updated[index].preference = newPreference; //update the new preference number at that index
+            
+    //         const email = localStorage.getItem("emailLoggedIn") || "[]"; //get email 
+    //         const storedLecturer = JSON.parse(localStorage.getItem(email) || "[]"); //get lecturer's data 
+    //         if (Array.isArray(storedLecturer)) {    
+    //           storedLecturer[index].preference = newPreference; //also update the new preference number to the storedLecturer 
+    //           localStorage.setItem(email, JSON.stringify(storedLecturer)); //save it to lecturer's data on local storage
+    //         }
+    //       }
+    //       return updated;
+    //     });
+    //   };
 
     useEffect(() => {
-        const email = localStorage.getItem("emailLoggedIn") || "[]"; //get email 
-        const storedLecturer: ApplicationData[] = JSON.parse(localStorage.getItem(email) || "{}"); //get lecturer's data 
-    
-        if (storedLecturer && Array.isArray(storedLecturer)) { //check if storedLecturer exists and is an array 
-            const commentMap: { [index: number]: string[] } = {}; //map to store candidate's comments
-            const chosenMap: { [index: number]: boolean } = {}; //map to store chosen candidates
-    
-            storedLecturer.forEach((candidate, index: number) => {//loop through the chosen candidates list
-                if (candidate) { //mark them as chosen if they are not null
-                    chosenMap[index] = true;
-    
-                    if (Array.isArray(candidate.comment)) {//if that candidate have comments, store it to comment map 
-                        commentMap[index] = candidate.comment;
-                    }
-                }
-            });
-            
-            //set the state with the new data 
-            setSentComment(commentMap);
-            // setChosenCandidates(chosenMap);
-            setCandidateArray([...storedLecturer]);
-        }
+        fetchChosen()
+        loadComments()
     }, []);
 
     const applicantList = (): React.JSX.Element => {
         return (
             <>
-                {candidateArray.map((candidate, index) => (
+                {chosenCandidates.map((candidate, index) => (
                     candidate ? (
                     <div key={index} className={styles.container}>
                         <ul className = {styles.jobCard}>
@@ -134,8 +150,8 @@ interface ApplicationData{
                             <li>
                                 <h2>Preference: </h2>
 
-                                <select className='rounded-md bg-gray-300 text-xl' value={candidate.preference || ""} onChange={(e) => handlePreference(index, parseInt(e.target.value))}>
-                                    {candidateArray
+                                <select className='rounded-md bg-gray-300 text-xl' /*value={candidate.chosenBy || ""} onChange={(e) => handlePreference(index, parseInt(e.target.value))}*/>
+                                    {chosenCandidates
                                         .filter(candidate => candidate !== null)
                                         .map((_, idx) => (
                                         <option key={idx} value={idx + 1}>
@@ -166,17 +182,18 @@ interface ApplicationData{
                             <li><p><strong>Comment(s):</strong></p></li>
 
                             <div>
-                                {(sentComment[index] || []).map((comment, i) => (
+                                {(sentComment[candidate.applicationId] || []).map((comment, i) => (
                                     <>
                                         <div key={i} className='mb-3 p-2 w-full break-words rounded-md bg-gray-200'>   
-                                            <div className='flex gap-1'>                 
-                                                <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000"><path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-240v-32q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v32q0 33-23.5 56.5T720-160H240q-33 0-56.5-23.5T160-240Zm80 0h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/></svg>
-                                                
-                                                {/* the split process appears here, the name should be
-                                                            at the first index after split (unless someone named themself /|theBestDelimiter/|) */}
-                                                <h3><strong>{comment.split("/|theBestDelimiter/|")[0]}</strong></h3> 
-
-                                            </div>     
+                                            <div className='flex justify-between items-center gap-1'>                 
+                                                <div className='flex items-center gap-1'>
+                                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000000">
+                                                        <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-240v-32q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v32q0 33-23.5 56.5T720-160H240q-33 0-56.5-23.5T160-240Zm80 0h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z"/>
+                                                    </svg>
+                                                    <h3><strong>{comment.split("/|theBestDelimiter/|")[0]}</strong></h3> 
+                                                </div>
+                                                    <h3><strong>Posted at: </strong>{comment.split("/|theBestDelimiter/|")[2]}</h3> 
+                                            </div>         
                                             {/*the name should be at the second index after split (unless someone accidently commented /|theBestDelimiter/|) */}
                                             {comment.split("/|theBestDelimiter/|")[1]}
                                         </div>
@@ -190,6 +207,7 @@ interface ApplicationData{
                                 rows={4}
                                 placeholder="Type your comment"
                                 value={comment[index] || ""}
+                                maxLength={250}
                                 className="flex-1 border-2 rounded-md border-blue-600 text-lg p-1 w-full resize-none"
                                 onChange={(e) => {
                                     const value = e.target.value;
@@ -199,7 +217,7 @@ interface ApplicationData{
                             </div>
 
                             <div className="flex justify-end">
-                                <button onClick={() => handleComment(index)} className="bg-blue-500 hover:bg-sky-700" type="button">Comment</button>
+                                <button onClick={() => handleComment(index , candidate.applicationId)} className="bg-blue-500 hover:bg-sky-700" type="button">Comment</button>
                             </div>
                         </ul>
                     </div>

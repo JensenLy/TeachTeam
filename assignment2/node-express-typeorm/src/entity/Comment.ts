@@ -24,11 +24,11 @@ export class Comment {
   @CreateDateColumn()
   createdAt: Date;
 
-  @OneToOne(() => Applications, application => application.comments, {nullable: true})
+  @ManyToOne(() => Applications, application => application.comments, {nullable: true})
   @JoinColumn({ name: "applicationId" })
   application: Applications;
 
-  @OneToOne(() => LecturerProfile, lecturer => lecturer.comments)
+  @ManyToOne(() => LecturerProfile, lecturer => lecturer.comments)
   @JoinColumn({ name: "lecturerId" })
   lecturer: User;
 }

@@ -125,3 +125,17 @@ export const applicationApi = {
     return response.data;
   }
 };
+
+
+export const commentApi = {
+  getAllComments: async () => {
+    const response = await api.get("/comments");
+    return response.data;
+  },
+
+  createComment: async (content:string, applicationId: number, lecturerId: number) => {
+    const response = await api.post(`/comments`, { content, applicationId, lecturerId });
+    return response.data;
+  },
+
+};
