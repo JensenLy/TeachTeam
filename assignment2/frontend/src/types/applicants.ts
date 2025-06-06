@@ -11,4 +11,5 @@ export type Applicant = {
     status: number
     applicationId: number
     chosenBy: string
+    role: "Tutor" | "Lab Assistance"
 }

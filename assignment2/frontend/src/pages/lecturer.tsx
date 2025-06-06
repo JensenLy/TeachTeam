@@ -12,6 +12,7 @@ export default function Lecturer() {
   const [tutorName, setTutorName] = useState<string>("");
   const [courseName, setCourseName] = useState<string>("");
   const [skillSets, setSkillSets] = useState<string>("");
+  const [role, setRole] = useState<string>("");
   const [chosenCandidates, setChosenCandidates] = useState<{ [index: number]: boolean }>({});
   const [userID, setUserID] = useState<number>(0);
 
@@ -39,7 +40,8 @@ export default function Lecturer() {
             count: app.count,
             status: 0,
             applicationId: app.applicationId,
-            chosenBy: app.chosenBy
+            chosenBy: app.chosenBy,
+            role: app.role
           };
           filteredApplications.push(appli);
         } else {
@@ -103,7 +105,8 @@ export default function Lecturer() {
         (courseName === "" || app.courseName === courseName) &&
         (availibility === "" || app.userAvailability === availibility) &&
         (tutorName === "" || fullName === tutorName) &&
-        (skillSets === "" || app.skill === skillSets)
+        (skillSets === "" || app.skill === skillSets) &&
+        (role === "" || app.role === role)
       );
     });
 
@@ -249,6 +252,17 @@ export default function Lecturer() {
                 </option>
               ))}
             </select>
+
+            <label className="text-xl text-blue-600">Role:</label>
+            <select
+              id="filter-type"
+              className="w-20 border-blue-600 rounded-lg p-1 border-2 bg-white text-blue-500"
+              onChange={(e) => setRole(e.target.value)}
+            >
+              <option value=""></option>
+              <option value="Tutor">Tutor</option>
+              <option value="Lab Assistance">Lab Assistance</option>
+            </select>
           </div>
 
           {/* Candidate List */}
@@ -285,6 +299,7 @@ export default function Lecturer() {
                 <li><p><strong>Academic Credential(s):</strong> {candidate.academic}</p></li>
 
                 <li><p><strong>Previous Role(s):</strong> {candidate.prevRoles}</p></li>
+                <li><p><strong>Role:</strong>{candidate.role}</p></li>
               </ul>
             </div>
           ))}
