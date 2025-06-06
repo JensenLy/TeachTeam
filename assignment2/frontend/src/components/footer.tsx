@@ -13,9 +13,11 @@ export default function Footer() {
         <div className="flex justify-around w-full">
             <ul className="flex overflow-auto p-5 text-white">
                 <li><Link href="/" className="hover:bg-sky-700 duration-100 rounded-md p-3">Home</Link></li>
-
                 {isLoggedIn ? (
+                  <>
                     <li><Link className="hover:bg-sky-700 duration-75 rounded-md p-3" onClick={() => setIsLoggedIn(false)} href="/">Sign Out</Link></li>
+                    <li><Link className="hover:bg-sky-700 duration-75 rounded-md p-3" href="/profile">Profile</Link></li>
+                  </>
                     ) : (
                     <>
                     <li><Link href="/signup" className="hover:bg-sky-700 duration-100 rounded-md p-3">Sign Up</Link></li>
