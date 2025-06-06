@@ -131,15 +131,10 @@ export default function Lecturer() {
     ...zeroCount,
   ];
 
+
   //different styling for different status 
   const getStatusClass = (status: number) => {
     switch (status) {
-      case 1:
-        return "flex justify-center text-lg text-black font-bold rounded-xl border border-black bg-yellow-500"; 
-      case 2:
-        return "flex justify-center text-lg text-black font-bold rounded-xl border border-black bg-gray-400";
-      case 3:
-        return "flex justify-center text-lg text-black font-bold rounded-xl border border-black bg-gray-200"; 
       default:
         return "flex justify-center text-lg text-black font-bold rounded-xl border border-black bg-blue-300"; 
     }
@@ -265,13 +260,47 @@ export default function Lecturer() {
             </select>
           </div>
 
+            <div className="flex max-w-[99%] m-3 flex-row flex-wrap bg-white rounded-lg p-2 justify-center items-center gap-4">
+              <details className="border-blue-600 rounded-lg p-1 border-2 bg-white text-blue-500"
+              id="filter-name">
+                <summary className="text-blue"><b>Most Chosen Candidate(s)</b></summary>
+                  <ul>
+                    {nonZero.filter(app => app.status === 1).map((app,i) => (
+                      <li className="text-blue-600" key={`most-${i}`}>- {app.firstName} {app.lastName} ({app.courseName}) ({app.role})- {app.count} votes</li>
+                    ))}
+                  </ul>
+              </details>
+
+              <details className="border-blue-600 rounded-lg p-1 border-2 bg-white text-blue-500"
+              id="filter-name">
+                <summary><b>Least Chosen Candidate(s)</b></summary>
+                <ul>
+                    {nonZero.filter(app => app.status === 2).map((app,i) => (
+                      <li className="text-blue-600" key={`least-${i}`}>- {app.firstName} {app.lastName} ({app.courseName}) ({app.role}) - {app.count} votes</li>
+                    ))}
+                </ul>
+              </details>
+
+              <details className="border-blue-600 rounded-lg p-1 border-2 text-blue-500"
+              id="filter-name">
+                <summary className=""><b>Not Chosen</b></summary>
+                <ul>
+                  {zeroCount.map((app,i) => (
+                    <li className="text-blue-600" key={`not-${i}`}>
+                      - {app.firstName} {app.lastName} ({app.courseName}) ({app.role}) - {app.count} votes
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            </div>
+
           {/* Candidate List */}
           {orderedApplicants.map((candidate) => (
             <div className={styles.container} key={candidate.originalIndex}>
               <div className={getStatusClass(candidate.status)}>
                 {candidate.status === 0 && "Not Selected By Anyone Yet"}
-                {candidate.status === 1 && `Most Chosen - ${candidate.count} vote`}
-                {candidate.status === 2 && `Least Chosen - ${candidate.count} vote`}
+                {candidate.status === 1 &&  `${candidate.count} vote`}
+                {candidate.status === 2 && ` ${candidate.count} vote`}
                 {candidate.status === 3 && `${candidate.count} vote`}
               </div>
               <ul className={styles.jobCard}>
@@ -299,7 +328,7 @@ export default function Lecturer() {
                 <li><p><strong>Academic Credential(s):</strong> {candidate.academic}</p></li>
 
                 <li><p><strong>Previous Role(s):</strong> {candidate.prevRoles}</p></li>
-                <li><p><strong>Role:</strong>{candidate.role}</p></li>
+                <li><p><strong>Role:</strong> {candidate.role}</p></li>
               </ul>
             </div>
           ))}
