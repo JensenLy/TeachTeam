@@ -67,13 +67,13 @@ export default function Lecturer() {
       try {
         const email = localStorage.getItem("emailLoggedIn") || "";
         const userData = await userApi.getUserByEmail(email);
-        setUserID(userData.id);
+        setUserID(userData.lecturerProfile?.lecturerId);
 
         const chosenStatus: { [index: number]: boolean } = {};
 
         applicationData.forEach((app, index) => {
           const chosenList = app.chosenBy ? app.chosenBy.split(",") : [];
-          chosenStatus[index] = chosenList.includes(String(userData.id));
+          chosenStatus[index] = chosenList.includes(String(userData.lecturerProfile?.lecturerId));
         });
 
         setChosenCandidates(chosenStatus);
