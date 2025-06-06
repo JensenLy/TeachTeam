@@ -10,7 +10,7 @@ export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
     const { isLoggedIn, setIsLoggedIn, userRole } = useContext(LoginContext) as LoginContextType;
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
-    console.log(showProfileDropdown)
+    // console.log(showProfileDropdown)
 
     return (
         <header className="flex-1 w-full text-white bg-blue-500 justify-center p-7">
