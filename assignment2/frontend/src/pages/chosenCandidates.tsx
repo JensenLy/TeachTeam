@@ -41,7 +41,8 @@ const[chosenCandidates, setChosenCandidates] = useState<Applicant[]>([]);
                 count: app.count,
                 status: 0,
                 applicationId: app.applicationId,
-                chosenBy: app.chosenBy
+                chosenBy: app.chosenBy,
+                role: app.role
                 };
                 chosenApplications.push(appli);
             }
