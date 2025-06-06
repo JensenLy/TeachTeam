@@ -16,40 +16,44 @@ export default function Lecturer() {
   const [userID, setUserID] = useState<number>(0);
 
   const fetchApplications = async () => {
-      try {
-        const data = await applicationApi.getAllApps();
-        const email = localStorage.getItem("emailLoggedIn") || "";
-        const lecturer = await userApi.getUserByEmail(email);
-        const coursesAssigned = lecturer.lecturerProfile?.coursesAssigned
-        const coursesAssignedArr = coursesAssigned ? coursesAssigned.split(",") : [];
+    try {
+      const data = await applicationApi.getAllApps();
+      const email = localStorage.getItem("emailLoggedIn") || "";
+      const lecturer = await userApi.getUserByEmail(email);
+      const coursesAssigned = lecturer.lecturerProfile?.coursesAssigned;
+      const coursesAssignedArr = coursesAssigned ? coursesAssigned.split(",") : [];
 
-          data.forEach((app: any) => {
-            const appli:Applicant = {
-              firstName: app.candidate?.user?.firstName,
-              lastName: app.candidate?.user?.lastName,
-              email: app.candidate.user?.email,
-              skill: app.skills,
-              academic: app.academic,
-              prevRoles: app.prevRoles,
-              userAvailability: app.availability,
-              courseName: app.courses?.title,
-              count: app.count,
-              status: 0,
-              applicationId: app.applicationId,
-              chosenBy: app.chosenBy
-            }
-            if (coursesAssignedArr.includes(app.courses?.courseId.toString())){
-              setApplicationData(prev => [...prev, appli]);
-            }
-            else{
-              console.log("No course found")
-            }
-            
-          });
-      } catch (err) {
-        console.log(err);
-        console.log("Failed to fetch applications 0");
-      } 
+      const filteredApplications: Applicant[] = [];
+
+      data.forEach((app: any) => {
+        if (coursesAssignedArr.includes(app.courses?.courseId?.toString())) {
+          const appli: Applicant = {
+            firstName: app.candidate?.user?.firstName,
+            lastName: app.candidate?.user?.lastName,
+            email: app.candidate.user?.email,
+            skill: app.skills,
+            academic: app.academic,
+            prevRoles: app.prevRoles,
+            userAvailability: app.availability,
+            courseName: app.courses?.title,
+            count: app.count,
+            status: 0,
+            applicationId: app.applicationId,
+            chosenBy: app.chosenBy
+          };
+          filteredApplications.push(appli);
+        } else {
+          console.log("No course found");
+        }
+      });
+
+      // Single state update, replaces all previous data
+      setApplicationData(filteredApplications);
+
+    } catch (err) {
+      console.log(err);
+      console.log("Failed to fetch applications 0");
+    }
   };
 
   // initialise 
