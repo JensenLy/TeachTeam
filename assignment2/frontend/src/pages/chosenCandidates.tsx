@@ -3,23 +3,24 @@ import styles from "../styles/sidebar.module.css"
 import Header from "../components/header"
 import Footer from "../components/footer";
 import Sidebar from "../components/sidebar";
-import { useContext } from "react";
-import { LoginContext, LoginContextType } from "@/contexts/LoginContext";
+import { useMemo } from "react";
 import { userApi, applicationApi, commentApi } from "../services/api";
 import { Applicant } from "../types/applicants";
-import App from 'next/app';
 
 export default function chosenCandidates() {
     
 const[comment, setComment] = useState<Record<number, string>>({});
 const[sentComment, setSentComment] = useState<{ [index: number]: string[] }>({});
 const[chosenCandidates, setChosenCandidates] = useState<Applicant[]>([]);
+// const [sortedCandidates, setSortedCandidates] = useState<Applicant[]>([]);
+const[lecturerData, setLecturerData] = useState<any>();
 
     const fetchChosen = async () => {
         try {
             const data = await applicationApi.getAllApps();
             const email = localStorage.getItem("emailLoggedIn") || "";
             const lecturer = await userApi.getUserByEmail(email);
+            setLecturerData(lecturer)
             const lecturerID = lecturer.lecturerProfile?.lecturerId;
 
             if (lecturerID === undefined || lecturerID === null) {
@@ -126,32 +127,94 @@ const[chosenCandidates, setChosenCandidates] = useState<Applicant[]>([]);
         }
     };
 
-    // const handlePreference = (index: number, newPreference: number) => {
-    //     setCandidateArray(prev => { //updating the candidateArray
-    //       const updated = [...prev]; //clone the current state array
-    //       if (updated[index]) { //check if that candidate exists (they should)
-    //         updated[index].preference = newPreference; //update the new preference number at that index
-            
-    //         const email = localStorage.getItem("emailLoggedIn") || "[]"; //get email 
-    //         const storedLecturer = JSON.parse(localStorage.getItem(email) || "[]"); //get lecturer's data 
-    //         if (Array.isArray(storedLecturer)) {    
-    //           storedLecturer[index].preference = newPreference; //also update the new preference number to the storedLecturer 
-    //           localStorage.setItem(email, JSON.stringify(storedLecturer)); //save it to lecturer's data on local storage
-    //         }
-    //       }
-    //       return updated;
-    //     });
-    //   };
+    const handlePreference = async (applicationId: number, newPreference: number) => {
+        const updatedData = chosenCandidates.map(app => {
+            if (app.applicationId !== applicationId) return app;
+
+            const chosenByStr: string = app.chosenBy || "";
+            const pairList: string[] = chosenByStr.split(",");
+
+            // Build map of lecturerId -> value
+            const chosenMap: Record<number, number> = {};
+            pairList.forEach((pair) => {
+                const [idStr, valueStr] = pair.split("_");
+                const id = parseInt(idStr);
+                const value = parseInt(valueStr);
+                if (!isNaN(id)) {
+                    chosenMap[id] = !isNaN(value) ? value : 0;
+                }
+            });
+
+            // Get current lecturer ID
+            const lecturerID = lecturerData?.lecturerProfile?.lecturerId;
+            if (lecturerID === undefined) {
+                console.warn("Lecturer ID missing");
+                return app;
+            }
+
+            // Update preference
+            chosenMap[lecturerID] = newPreference;
+
+            // Rebuild chosenBy string
+            const newChosenByStr = Object.entries(chosenMap)
+                .map(([id, val]) => `${id}_${val}`)
+                .join(",");
+
+            // Return updated application
+            return {
+                ...app,
+                chosenBy: newChosenByStr,
+            };
+        });
+
+        setChosenCandidates(updatedData);
+
+        // Sync updated application with backend
+        try {
+            const updatedApp = updatedData.find(app => app.applicationId === applicationId);
+            if (updatedApp) {
+                await applicationApi.updateCount(applicationId, updatedApp.count, updatedApp.chosenBy || "");
+            }
+        } catch (err) {
+            console.error("Failed to update preference on backend:", err);
+        }
+    };
 
     useEffect(() => {
         fetchChosen()
         loadComments()
     }, []);
 
+    const sortedCandidates = useMemo(() => {
+        if (!lecturerData?.lecturerProfile?.lecturerId) return [];
+
+        const lecturerID = lecturerData.lecturerProfile.lecturerId;
+
+        const getLecturerPreference = (candidate: Applicant): [number, number] => {
+            const chosenBy = candidate.chosenBy || "";
+            const match = chosenBy
+            .split(",")
+            .find((pair) => {
+                const [idStr] = pair.split("_");
+                return parseInt(idStr) === lecturerID;
+            });
+
+            if (!match) return [0, 0]; // no entry → sort first
+            const pref = parseInt(match.split("_")[1]);
+            return [1, isNaN(pref) ? Infinity : pref]; // has entry → sort by pref
+        };
+
+        return [...chosenCandidates].sort((a, b) => {
+            const [aHas, aPref] = getLecturerPreference(a);
+            const [bHas, bPref] = getLecturerPreference(b);
+            return aHas !== bHas ? aHas - bHas : aPref - bPref;
+        });
+    }, [chosenCandidates, lecturerData]);
+
     const applicantList = (): React.JSX.Element => {
         return (
             <>
-                {chosenCandidates.map((candidate, index) => (
+                {sortedCandidates.map((candidate, index) => (
                     candidate ? (
                     <div key={index} className={styles.container}>
                         <ul className = {styles.jobCard}>
@@ -160,15 +223,26 @@ const[chosenCandidates, setChosenCandidates] = useState<Applicant[]>([]);
                             <li>
                                 <h2>Preference: </h2>
 
-                                <select className='rounded-md bg-gray-300 text-xl' /*value={candidate.chosenBy || ""} onChange={(e) => handlePreference(index, parseInt(e.target.value))}*/>
-                                    {chosenCandidates
-                                        .filter(candidate => candidate !== null)
-                                        .map((_, idx) => (
+                                <select className="rounded-md bg-gray-300 text-xl"
+                                    value={
+                                        (() => {
+                                        const pair = (candidate.chosenBy || "").split(",").find(p => parseInt(p.split("_")[0]) === lecturerData.lecturerProfile?.lecturerId);
+                                        const pref = pair ? parseInt(pair.split("_")[1]) : 0;
+                                        return pref === 0 ? "" : pref; // Show empty string (--) if pref is 0
+                                        })()
+                                    }
+                                    onChange={(e) => {
+                                        // Convert empty string (--) back to 0 when updating preference
+                                        const val = e.target.value === "" ? 0 : parseInt(e.target.value);
+                                        handlePreference(candidate.applicationId, val);
+                                    }}
+                                >
+                                    <option value="">--</option>
+                                    {sortedCandidates.filter(candidate => candidate !== null).map((_, idx) => (
                                         <option key={idx} value={idx + 1}>
                                             {idx + 1}
                                         </option>
-                                        ))
-                                    }
+                                    ))}
                                 </select>
                             </li>
                             </div>
