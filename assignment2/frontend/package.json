@@ -10,12 +10,17 @@
     "test": "jest"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.10.9",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "argon2": "^0.43.0",
     "axios": "^1.9.0",
+    "framer-motion": "^12.16.0",
     "next": "15.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-password-checklist": "^1.8.1"
+    "react-password-checklist": "^1.8.1",
+    "recharts": "^2.15.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -5,6 +5,7 @@ import SideBar from "../components/sidebar";
 import styles from "../styles/sidebar.module.css";
 import { Applicant } from "../types/applicants";
 import { courseApi, Course, candidateApi, userApi, Application, applicationApi } from "../services/api";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function Lecturer() {
   const [applicationData, setApplicationData] = useState<Applicant[]>([]);
@@ -131,6 +132,12 @@ export default function Lecturer() {
     ...zeroCount,
   ];
 
+  const chartData = orderedApplicants.map((app) => ({
+    name: `${app.firstName} ${app.lastName} (${app.courseName})`,
+    votes: app.count
+  }))
+
+  console.log(chartData)
 
   //different styling for different status 
   const getStatusClass = (status: number) => {
@@ -261,36 +268,18 @@ export default function Lecturer() {
           </div>
 
             <div className="flex max-w-[99%] m-3 flex-row flex-wrap bg-white rounded-lg p-2 justify-center items-center gap-4">
-              <details className="border-blue-600 rounded-lg p-1 border-2 bg-white text-blue-500"
-              id="filter-name">
-                <summary className="text-blue"><b>Most Chosen Candidate(s)</b></summary>
-                  <ul>
-                    {nonZero.filter(app => app.status === 1).map((app,i) => (
-                      <li className="text-blue-600" key={`most-${i}`}>- {app.firstName} {app.lastName} ({app.courseName}) ({app.role})- {app.count} votes</li>
-                    ))}
-                  </ul>
-              </details>
-
-              <details className="border-blue-600 rounded-lg p-1 border-2 bg-white text-blue-500"
-              id="filter-name">
-                <summary><b>Least Chosen Candidate(s)</b></summary>
-                <ul>
-                    {nonZero.filter(app => app.status === 2).map((app,i) => (
-                      <li className="text-blue-600" key={`least-${i}`}>- {app.firstName} {app.lastName} ({app.courseName}) ({app.role}) - {app.count} votes</li>
-                    ))}
-                </ul>
-              </details>
-
-              <details className="border-blue-600 rounded-lg p-1 border-2 text-blue-500"
-              id="filter-name">
-                <summary className=""><b>Not Chosen</b></summary>
-                <ul>
-                  {zeroCount.map((app,i) => (
-                    <li className="text-blue-600" key={`not-${i}`}>
-                      - {app.firstName} {app.lastName} ({app.courseName}) ({app.role}) - {app.count} votes
-                    </li>
-                  ))}
-                </ul>
+              <details className="border-blue-600 rounded-lg p-1 border-2 bg-white text-blue-500 w-full">
+                  <summary>Applicant Vote Chart</summary>
+                <div style={{width:"100%", height:300}}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart layout="vertical" data={chartData} margin={{top: 10, right:20, left: 100, bottom:10}} barGap={10} barCategoryGap={10}>
+                      <XAxis type="number"/>
+                      <YAxis type="category" dataKey="name" width={150} tickMargin={5}/>
+                      <Tooltip/>
+                      <Bar dataKey="votes" fill="#4299E1"/> 
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
               </details>
             </div>
 
