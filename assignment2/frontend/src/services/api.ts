@@ -138,4 +138,9 @@ export const commentApi = {
     return response.data;
   },
 
+  deleteComment: async (id: number) => {
+    const response = await api.delete(`/comments/${id}`);
+    return response.data;
+  },
+
 };
