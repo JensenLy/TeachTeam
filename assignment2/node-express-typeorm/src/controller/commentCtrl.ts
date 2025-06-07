@@ -37,4 +37,18 @@ export class commentCtrl {
           return response.status(400).json({ message: "Error creating application", error });
         }
     }
+
+    async remove(request: Request, response: Response) {
+      const id = parseInt(request.params.id);
+      const cmtToRemove = await this.CommentRepo.findOne({
+        where: { id },
+      });
+
+      if (!cmtToRemove) {
+        return response.status(404).json({ message: "Comment not found" });
+      }
+
+      await this.CommentRepo.remove(cmtToRemove);
+      return response.json({ message: "Comment removed successfully" });
+    }
 }

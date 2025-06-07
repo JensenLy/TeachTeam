@@ -1,10 +1,8 @@
-import e from "express";
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
-  OneToOne,
   ManyToOne,
   JoinColumn,
 } from "typeorm";

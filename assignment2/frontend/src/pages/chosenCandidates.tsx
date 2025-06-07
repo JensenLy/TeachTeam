@@ -12,7 +12,6 @@ export default function chosenCandidates() {
 const[comment, setComment] = useState<Record<number, string>>({});
 const[sentComment, setSentComment] = useState<{ [index: number]: string[] }>({});
 const[chosenCandidates, setChosenCandidates] = useState<Applicant[]>([]);
-// const [sortedCandidates, setSortedCandidates] = useState<Applicant[]>([]);
 const[lecturerData, setLecturerData] = useState<any>();
 
     const fetchChosen = async () => {
@@ -103,6 +102,17 @@ const[lecturerData, setLecturerData] = useState<any>();
         }
     };
 
+    const deleteComment = async (commentID: string) => {
+        try {
+            const id = parseInt(commentID)
+            await commentApi.deleteComment(id);
+        
+        } catch (err) {
+        console.error("Failed to delete comments:", err);
+        }
+        loadComments()
+    };
+
     const loadComments = async () => {
         try {
         const allComments = await commentApi.getAllComments();
@@ -117,8 +127,7 @@ const[lecturerData, setLecturerData] = useState<any>();
 
             // Construct comment string with name delimiter
             const commenter = `${cmt.lecturer?.user?.firstName} ${cmt.lecturer?.user?.lastName}`;
-            const commentTime = `${cmt.createdAt}`
-            commentMap[appId].push(`${commenter}/|theBestDelimiter/|${cmt.content}/|theBestDelimiter/|${commentTime}`);
+            commentMap[appId].push(`${commenter}/|theBestDelimiter/|${cmt.content}/|theBestDelimiter/|${cmt.createdAt}/|theBestDelimiter/|${cmt.id}`);
         });
 
         setSentComment(commentMap);
@@ -281,7 +290,12 @@ const[lecturerData, setLecturerData] = useState<any>();
                                                     </svg>
                                                     <h3><strong>{comment.split("/|theBestDelimiter/|")[0]}</strong></h3> 
                                                 </div>
+                                                <div className='flex'>
                                                     <h3><strong>Posted at: </strong>{comment.split("/|theBestDelimiter/|")[2]}</h3> 
+                                                    <button onClick={() => deleteComment(comment.split("/|theBestDelimiter/|")[3])} className='bg-red-500 hover:bg-red-700 !px-4 !py-0 !ml-1'>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
+                                                    </button>
+                                                </div>
                                             </div>         
                                             {/*the name should be at the second index after split (unless someone accidently commented /|theBestDelimiter/|) */}
                                             {comment.split("/|theBestDelimiter/|")[1]}
@@ -292,17 +306,17 @@ const[lecturerData, setLecturerData] = useState<any>();
                             </div>
 
                             <div key={index}> 
-                            <textarea
-                                rows={4}
-                                placeholder="Type your comment"
-                                value={comment[index] || ""}
-                                maxLength={250}
-                                className="flex-1 border-2 rounded-md border-blue-600 text-lg p-1 w-full resize-none"
-                                onChange={(e) => {
-                                    const value = e.target.value;
-                                    setComment(prev => ({ ...prev, [index]: value }));
-                                }}
-                            ></textarea>
+                                <textarea
+                                    rows={4}
+                                    placeholder="Type your comment"
+                                    value={comment[index] || ""}
+                                    maxLength={250}
+                                    className="flex-1 border-2 rounded-md border-blue-600 text-lg p-1 w-full resize-none"
+                                    onChange={(e) => {
+                                        const value = e.target.value;
+                                        setComment(prev => ({ ...prev, [index]: value }));
+                                    }}
+                                ></textarea>
                             </div>
 
                             <div className="flex justify-end">
