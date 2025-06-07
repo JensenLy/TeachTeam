@@ -61,8 +61,8 @@ export default function Profile() {
         });
     };
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div className="text-red-500">{error}</div>;
+    if (loading) return <div className="flex justify-center items-center">Loading...</div>
+    if (error) return <div className="lex justify-center items-center text-red-500">{error}</div>
 
     return (
         <div>
