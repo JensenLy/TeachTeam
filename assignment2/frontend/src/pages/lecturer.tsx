@@ -80,7 +80,8 @@ export default function Lecturer() {
 
         applicationData.forEach((app, index) => {
           const chosenList = app.chosenBy ? app.chosenBy.split(",") : [];
-          chosenStatus[index] = chosenList.includes(String(userData.lecturerProfile?.lecturerId));
+          const idList = chosenList.map((pair) => parseInt(pair.split("_")[0])).filter((id) => !isNaN(id));
+          chosenStatus[index] = idList.includes(userData.lecturerProfile?.lecturerId ?? -1);
         });
 
         setChosenCandidates(chosenStatus);
@@ -137,7 +138,7 @@ export default function Lecturer() {
     votes: app.count
   }))
 
-  console.log(chartData)
+  // console.log(chartData)
 
   //different styling for different status 
   const getStatusClass = (status: number) => {
@@ -159,17 +160,34 @@ export default function Lecturer() {
 
     const oldCount = app.count || 0;
     const chosenListStr = app.chosenBy || "";
-    const chosenListArr = chosenListStr.split(",").map((id) => parseInt(id)).filter((id) => !isNaN(id));
-    
-    let newChosenListArr: number[];
+    const chosenMap: Record<number, number> = {}; 
 
+    chosenListStr.split(",").forEach((pair) => {
+      const [idStr, prefStr] = pair.split("_");
+      const id = parseInt(idStr);
+      const pref = parseInt(prefStr);
+
+      if (!isNaN(id)) {
+        chosenMap[id] = !isNaN(pref) ? pref : 0;
+      }
+
+    });
+
+    // Add or remove current userID from map
     if (isSelected) {
-      newChosenListArr = chosenListArr.includes(userID) ? chosenListArr : [...chosenListArr, userID];
+
+      if (!(userID in chosenMap)) {
+        chosenMap[userID] = 0;
+      }
+      
     } else {
-      newChosenListArr = chosenListArr.filter((id) => id !== userID);
+      delete chosenMap[userID];
     }
 
-    const newChosenListStr = newChosenListArr.join(",");
+    // Rebuild the chosenBy string
+    const newChosenListStr = Object.entries(chosenMap)
+      .map(([id, pref]) => `${id}_${pref}`)
+      .join(",");
 
     // Update frontend state
     updatedData[index] = {

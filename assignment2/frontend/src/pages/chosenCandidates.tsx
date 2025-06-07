@@ -20,38 +20,47 @@ const[chosenCandidates, setChosenCandidates] = useState<Applicant[]>([]);
             const data = await applicationApi.getAllApps();
             const email = localStorage.getItem("emailLoggedIn") || "";
             const lecturer = await userApi.getUserByEmail(email);
-            const lecturerID = lecturer.lecturerProfile?.lecturerId?.toString();
+            const lecturerID = lecturer.lecturerProfile?.lecturerId;
+
+            if (lecturerID === undefined || lecturerID === null) {
+                console.warn("Lecturer ID is not available");
+                return;
+            }
 
             const chosenApplications: Applicant[] = [];
 
             data.forEach((app: any) => {
-            // Defensive: Ensure chosenBy is a string
-            const chosenList = typeof app.chosenBy === "string" ? app.chosenBy.split(",") : [];
+                // Defensive: Ensure chosenBy is a string
+                const pairList: string[] = typeof app.chosenBy === "string" ? app.chosenBy.split(",") : [];
+                const chosenList: number[] = pairList
+                    .map((pair: string) => parseInt(pair.split("_")[0]))
+                    .filter((id: number) => !isNaN(id));
+                console.log(chosenList)
 
-            if (chosenList.includes(lecturerID)) {
-                const appli: Applicant = {
-                firstName: app.candidate?.user?.firstName,
-                lastName: app.candidate?.user?.lastName,
-                email: app.candidate.user?.email,
-                skill: app.skills,
-                academic: app.academic,
-                prevRoles: app.prevRoles,
-                userAvailability: app.availability,
-                courseName: app.courses?.title,
-                count: app.count,
-                status: 0,
-                applicationId: app.applicationId,
-                chosenBy: app.chosenBy,
-                role: app.role
-                };
-                chosenApplications.push(appli);
-            }
+                if (chosenList.includes(lecturerID)) {
+                    const appli: Applicant = {
+                    firstName: app.candidate?.user?.firstName,
+                    lastName: app.candidate?.user?.lastName,
+                    email: app.candidate.user?.email,
+                    skill: app.skills,
+                    academic: app.academic,
+                    prevRoles: app.prevRoles,
+                    userAvailability: app.availability,
+                    courseName: app.courses?.title,
+                    count: app.count,
+                    status: 0,
+                    applicationId: app.applicationId,
+                    chosenBy: app.chosenBy,
+                    role: app.role
+                    };
+                    chosenApplications.push(appli);
+                }
             });
 
             if (chosenApplications.length > 0) {
-            console.log("Fetched chosen candidates");
+                console.log("Fetched chosen candidates");
             } else {
-            console.log("No candidates found");
+                console.log("No candidates found");
             }
 
             // Idempotent: Only set once with fresh data

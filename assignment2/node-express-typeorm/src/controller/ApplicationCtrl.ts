@@ -27,7 +27,6 @@ export class ApplicationCtrl {
   async save(request: Request, response: Response) {
 
       const { 
-        status,
         candidateId,
         courseId,
         availability,
