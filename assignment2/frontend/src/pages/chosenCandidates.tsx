@@ -6,13 +6,29 @@ import Sidebar from "../components/sidebar";
 import { useMemo } from "react";
 import { userApi, applicationApi, commentApi } from "../services/api";
 import { Applicant } from "../types/applicants";
+import { ApplicationData } from "@/types/applicationData";
+import { LecturerData } from "@/types/lecturerData";
+import { CommentData } from '@/types/commentData';
 
-export default function chosenCandidates() {
+export default function ChosenCandidates() {
     
 const[comment, setComment] = useState<Record<number, string>>({});
 const[sentComment, setSentComment] = useState<{ [index: number]: string[] }>({});
 const[chosenCandidates, setChosenCandidates] = useState<Applicant[]>([]);
-const[lecturerData, setLecturerData] = useState<any>();
+const[lecturerData, setLecturerData] = useState<LecturerData>({
+    id: 0,
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    role: "",
+    createdAt: "",
+    updatedAt: "",
+    lecturerProfile: {
+        lecturerId: 0,
+        coursesAssigned: ""
+    }
+});
 
     const fetchChosen = async () => {
         try {
@@ -29,7 +45,7 @@ const[lecturerData, setLecturerData] = useState<any>();
 
             const chosenApplications: Applicant[] = [];
 
-            data.forEach((app: any) => {
+            data.forEach((app: ApplicationData) => {
                 // Defensive: Ensure chosenBy is a string
                 const pairList: string[] = typeof app.chosenBy === "string" ? app.chosenBy.split(",") : [];
                 const chosenList: number[] = pairList
@@ -120,7 +136,7 @@ const[lecturerData, setLecturerData] = useState<any>();
         const commentMap: { [index: number]: string[] } = {};
 
         // Group by applicationId
-        allComments.forEach((cmt: any) => {
+        allComments.forEach((cmt: CommentData) => {
             const appId = cmt.application?.applicationId;
 
             if (!commentMap[appId]) commentMap[appId] = [];

@@ -1,9 +1,8 @@
-import React, { use } from "react";
+import React from "react";
 import { LoginContext, LoginContextType } from "@/contexts/LoginContext";
 import { useState, useEffect } from "react";
 import { userApi, User } from "../services/api";
 import Header from "@/components/header";
-import Footer from "@/components/footer";
 
 export default function Profile() {
     const {emailLoggedIn, setEmailLoggedIn} = React.useContext(LoginContext) as LoginContextType;
@@ -22,6 +21,7 @@ export default function Profile() {
                 console.log("Fetched user:", data);
             } catch (err) {
                 setError("User not found");
+                console.log(err)
             }
             finally {
                 setLoading(false)
@@ -49,6 +49,7 @@ export default function Profile() {
             setEditUser({});
         } catch (err) {
             setError("Failed to update user");
+            console.log(err)
         }
     };
 

@@ -4,12 +4,10 @@ import Link from "next/link";
 import { useContext } from "react";
 import { LoginContext } from "@/contexts/LoginContext";
 import { LoginContextType } from "@/contexts/LoginContext";
-import Profile from "../pages/profile";
 
 export default function Header() {
     const [isOpen, setIsOpen] = useState(false);
     const { isLoggedIn, setIsLoggedIn, userRole } = useContext(LoginContext) as LoginContextType;
-    const [showProfileDropdown, setShowProfileDropdown] = useState(false);
     // console.log(showProfileDropdown)
 
     return (

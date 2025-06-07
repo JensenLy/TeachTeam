@@ -4,7 +4,8 @@ import Footer from "../components/footer";
 import SideBar from "../components/sidebar";
 import styles from "../styles/sidebar.module.css";
 import { Applicant } from "../types/applicants";
-import { courseApi, Course, candidateApi, userApi, Application, applicationApi } from "../services/api";
+import { ApplicationData } from "@/types/applicationData";
+import { userApi, applicationApi } from "../services/api";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function Lecturer() {
@@ -27,7 +28,7 @@ export default function Lecturer() {
 
       const filteredApplications: Applicant[] = [];
 
-      data.forEach((app: any) => {
+      data.forEach((app: ApplicationData) => {
         if (coursesAssignedArr.includes(app.courses?.courseId?.toString())) {
           const appli: Applicant = {
             firstName: app.candidate?.user?.firstName,

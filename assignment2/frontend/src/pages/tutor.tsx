@@ -5,7 +5,6 @@ import Footer from "../components/footer";
 import Sidebar from "../components/sidebar";
 import { useContext } from "react";
 import { LoginContext, LoginContextType } from "@/contexts/LoginContext";
-import { JobInfo } from '../types/jobInfo';
 import SuccessScreen from '@/components/successScreen';
 import { courseApi, Course, candidateApi, userApi, Application, applicationApi } from "../services/api";
 
@@ -19,7 +18,6 @@ export default function Tutor() {
     const[screenState, setScreenState] = useState<boolean>(true)
     const context = useContext(LoginContext) as LoginContextType;
 
-    const [error, setError] = useState<string | null>(null);
     const [course, setCourse] = useState({
         courseId: 0,
         title: "",
@@ -36,9 +34,8 @@ export default function Tutor() {
         try {
         const data = await courseApi.getAllCourses();
         setCourses(data);
-        setError(null);
         } catch (err) {
-        setError("Failed to fetch users 0");
+        console.log("Failed to fetch users 0", err);
         } 
     };
 
@@ -104,7 +101,7 @@ export default function Tutor() {
                 {screenState ? (//swapScreen changes screenState which is used for this
                 <>
                 {courses.map((course, index) => (
-                    <div className={styles.container}>
+                    <div key={course.courseId || index} className={styles.container}>
                         <ul className = {styles.jobCard}>
                             <li><h2>{course.title} - {course.type}</h2></li>
 

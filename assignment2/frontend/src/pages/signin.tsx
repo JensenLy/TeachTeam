@@ -6,7 +6,6 @@
     import { useContext } from "react";
     import { LoginContext, LoginContextType } from "@/contexts/LoginContext";
     import { userApi } from "../services/api";
-    import argon2 from "argon2";
     // a list of users which are 3 tutors and 3 lecturers
 
     export default function SignIn(){
@@ -30,6 +29,7 @@
             return data;
         } catch (err) {
             setUser({firstName: "", lastName: "", email: "", password:"", role: ""})
+            console.log(err)
         }
     };
 

@@ -1,4 +1,9 @@
-export type User = {
+interface LecturerProfile {
+  lecturerId: number;
+  coursesAssigned: string;
+}
+
+export type LecturerData = {
   id: number;
   firstName: string;
   lastName: string;
@@ -7,4 +12,5 @@ export type User = {
   role: string;
   createdAt: string;
   updatedAt: string;
+  lecturerProfile?: LecturerProfile;
 }

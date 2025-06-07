@@ -1,5 +1,4 @@
 import axios from "axios";
-import { AxiosError } from "axios";
 
 export const api = axios.create({
   baseURL: "http://localhost:3001/api", 
@@ -116,6 +115,7 @@ export const applicationApi = {
       const response = await api.get(`/apps/check/${candidateId}/${courseId}`)
       return response.data.hasApplied;
     } catch (error){
+      console.log(error)
       return false;
     }
   },
