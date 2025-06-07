@@ -1,6 +1,5 @@
 import '@testing-library/jest-dom';
-import { fireEvent, getByTestId, render, screen } from '@testing-library/react'
-import { loginContext } from '@/contexts/LoginContext';
+import {render, screen } from '@testing-library/react'
 import SuccessScreen from '@/components/successScreen';
 
 /*  tests the rendering of the success screen to check

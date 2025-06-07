@@ -1,21 +1,29 @@
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen } from '@testing-library/react'
 import Header from '@/components/header'
-import { loginContext } from '@/contexts/LoginContext';
+import { LoginContext, LoginContextType } from '@/contexts/LoginContext';
 
 /* This test checks if the header component is being rendered properly
     with it's elements including logo and navigation links */
 
 test("header is being rendered properly with logo and nav links when users is logged out", () =>{
-    const testContext = {
+const testContext : LoginContextType ={
         isLoggedIn: false,
-        userRole: "",
+        firstNameLoggedIn: "John",
+        setFirstNameLoggedIn: jest.fn(),
+        lastNameLoggedIn: "Doe",
+        setLastNameLoggedIn: jest.fn(),
+        emailLoggedIn: "john@email.com",
+        setEmailLoggedIn: jest.fn(),
+        userRole: "user",
+        setUserRole: jest.fn(),
+        setIsLoggedIn: jest.fn()
     };
     
     render(
-        <loginContext.Provider value={testContext}>
+        <LoginContext.Provider value={testContext}>
             <Header/>
-        </loginContext.Provider>
+        </LoginContext.Provider>
     );
 
     const logo = screen.getByAltText("Logo");
@@ -44,16 +52,23 @@ a lecturer signs out by setting setIsLoggedIn(false) when user
 clicks it */
 
 test("When user clicks sign out it should set isLoggedin to false", () => {
-    const testContext = {
+const testContext : LoginContextType ={
         isLoggedIn: true,
-        userRole: "Lecturer",
+        firstNameLoggedIn: "John",
+        setFirstNameLoggedIn: jest.fn(),
+        lastNameLoggedIn: "Doe",
+        setLastNameLoggedIn: jest.fn(),
+        emailLoggedIn: "john@email.com",
+        setEmailLoggedIn: jest.fn(),
+        userRole: "lecturer",
+        setUserRole: jest.fn(),
         setIsLoggedIn: jest.fn()
     };
 
     render(
-        <loginContext.Provider value={testContext}>
+        <LoginContext.Provider value={testContext}>
             <Header />
-        </loginContext.Provider>
+        </LoginContext.Provider>
     );
 
     const signOutButton = screen.getByTestId("lecturer-signOut");
