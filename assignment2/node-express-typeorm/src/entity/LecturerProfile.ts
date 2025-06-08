@@ -5,6 +5,7 @@ import{
     JoinColumn,
     OneToOne,
     OneToMany,
+    ManyToMany,
 } from "typeorm";
 
 import { User } from "./User";
@@ -24,10 +25,10 @@ export class LecturerProfile {
     user: User;
 
     @OneToMany(() => Comment, comment => comment.lecturer)
-    @JoinColumn({ name: "commentId" })
+    // @JoinColumn({ name: "commentId" })
     comments: Comment[];
 
-    @OneToMany(() => Courses, course => course.lecturers)
+    @ManyToMany(() => Courses, course => course.lecturers)
     @JoinColumn({ name: "courseId" })
     courses: Courses[];
 }

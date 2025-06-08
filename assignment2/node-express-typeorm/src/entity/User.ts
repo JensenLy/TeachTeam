@@ -52,7 +52,4 @@ export class User {
   @JoinColumn({ name: "lecturerId" })
   lecturerProfile: LecturerProfile;
 
-  // @OneToOne(() => CandidateProfile, (candidateProfile) => candidateProfile.user, { nullable: true })
-  // @JoinColumn({ name: "candidateId" })
-  // candidateProfile: CandidateProfile;
 }

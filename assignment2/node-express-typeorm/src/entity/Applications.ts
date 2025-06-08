@@ -54,7 +54,7 @@ export class Applications {
   courses: Courses;
 
   @OneToMany(() => Comment, comment => comment.application)
-  @JoinColumn({ name: "commentsId" })
+  // @JoinColumn({ name: "commentsId" })
   comments: Comment[];
 
   @CreateDateColumn()

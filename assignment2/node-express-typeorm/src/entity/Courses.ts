@@ -4,7 +4,8 @@ import {
     Column,
     CreateDateColumn,
     OneToMany,
-    JoinColumn
+    JoinColumn,
+    ManyToMany
 } from "typeorm";
 
 import { Applications } from "./Applications";
@@ -37,10 +38,10 @@ export class Courses {
     createdAt: Date;
 
     @OneToMany(() => Applications, application => application.courses)
-    @JoinColumn({ name: "applicationsId" })
+    // @JoinColumn({ name: "applicationsId" })
     applications: Applications[];
 
-    @OneToMany(() => LecturerProfile, lecturer => lecturer.coursesAssigned)
+    @ManyToMany(() => LecturerProfile, lecturer => lecturer.coursesAssigned)
     @JoinColumn({ name: "lecturerId" })
     lecturers: LecturerProfile[];
 }

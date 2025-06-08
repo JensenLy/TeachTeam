@@ -28,5 +28,5 @@ export class Comment {
 
   @ManyToOne(() => LecturerProfile, lecturer => lecturer.comments)
   @JoinColumn({ name: "lecturerId" })
-  lecturer: User;
+  lecturer: LecturerProfile;
 }

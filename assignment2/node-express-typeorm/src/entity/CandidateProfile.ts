@@ -23,6 +23,6 @@ export class CandidateProfile {
     user: User;
 
     @OneToMany(() => Applications, application => application.candidate)
-    @JoinColumn({ name: "applicationId" })
+    // @JoinColumn({ name: "applicationId" })
     application: Applications[];
 }
