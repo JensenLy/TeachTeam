@@ -32,7 +32,10 @@ const[lecturerData, setLecturerData] = useState<LecturerData>({
 
     const fetchChosen = async () => {
         try {
+            //get all applications
             const data = await applicationApi.getAllApps();
+
+            //get and set lecturer data and ID by the email in localstorage
             const email = localStorage.getItem("emailLoggedIn") || "";
             const lecturer = await userApi.getUserByEmail(email);
             setLecturerData(lecturer)
@@ -46,12 +49,12 @@ const[lecturerData, setLecturerData] = useState<LecturerData>({
             const chosenApplications: Applicant[] = [];
 
             data.forEach((app: ApplicationData) => {
-                // Defensive: Ensure chosenBy is a string
+                // breakdown chosenBy to know which application is chosen by which lecturer
                 const pairList: string[] = typeof app.chosenBy === "string" ? app.chosenBy.split(",") : [];
                 const chosenList: number[] = pairList
                     .map((pair: string) => parseInt(pair.split("_")[0]))
                     .filter((id: number) => !isNaN(id));
-                console.log(chosenList)
+                // console.log(chosenList)
 
                 if (chosenList.includes(lecturerID)) {
                     const appli: Applicant = {
@@ -69,7 +72,7 @@ const[lecturerData, setLecturerData] = useState<LecturerData>({
                     chosenBy: app.chosenBy,
                     role: app.role
                     };
-                    chosenApplications.push(appli);
+                    chosenApplications.push(appli); //add each applicant to chosenApplications
                 }
             });
 
@@ -79,7 +82,7 @@ const[lecturerData, setLecturerData] = useState<LecturerData>({
                 console.log("No candidates found");
             }
 
-            // Idempotent: Only set once with fresh data
+            // set chosenCandidates
             setChosenCandidates(chosenApplications);
 
         } catch (err) {
@@ -89,6 +92,7 @@ const[lecturerData, setLecturerData] = useState<LecturerData>({
     };
 
     const handleComment = async (index: number, applicationId: number) => {
+        //get lecturerID 
         const email = localStorage.getItem("emailLoggedIn") || "";
         const lecturer = await userApi.getUserByEmail(email);
         const lecturerID = lecturer.lecturerProfile?.lecturerId;
@@ -106,6 +110,7 @@ const[lecturerData, setLecturerData] = useState<LecturerData>({
             });
         
             try {
+                //add new comment to the database
                 await commentApi.createComment(newComment, applicationId, lecturerID)
             } catch (err) {
                 console.error("Failed to update backend:", err);
@@ -114,34 +119,34 @@ const[lecturerData, setLecturerData] = useState<LecturerData>({
             
             // clear textarea after submit 
             setComment(prev => ({ ...prev, [index]: "" }));
-            loadComments()
+            loadComments() //reload comments to be up to date with the database
         }
     };
 
     const deleteComment = async (commentID: string) => {
         try {
-            const id = parseInt(commentID)
-            await commentApi.deleteComment(id);
+            const id = parseInt(commentID) //convert the id from string to int for processing in the backend
+            await commentApi.deleteComment(id); //delete comment from the database
         
         } catch (err) {
         console.error("Failed to delete comments:", err);
         }
-        loadComments()
+        loadComments() //reload comments to be up to date with the database
     };
 
     const loadComments = async () => {
         try {
-        const allComments = await commentApi.getAllComments();
+        const allComments = await commentApi.getAllComments(); //get all comments 
 
         const commentMap: { [index: number]: string[] } = {};
 
-        // Group by applicationId
+        // group by applicationId
         allComments.forEach((cmt: CommentData) => {
             const appId = cmt.application?.applicationId;
 
             if (!commentMap[appId]) commentMap[appId] = [];
 
-            // Construct comment string with name delimiter
+            // merge the commenter name, content, comment date and comment id into one string with delimiter
             const commenter = `${cmt.lecturer?.user?.firstName} ${cmt.lecturer?.user?.lastName}`;
             commentMap[appId].push(`${commenter}/|theBestDelimiter/|${cmt.content}/|theBestDelimiter/|${cmt.createdAt}/|theBestDelimiter/|${cmt.id}`);
         });
@@ -159,33 +164,31 @@ const[lecturerData, setLecturerData] = useState<LecturerData>({
             const chosenByStr: string = app.chosenBy || "";
             const pairList: string[] = chosenByStr.split(",");
 
-            // Build map of lecturerId -> value
+            // make a chosenMap with lecturerId and preference
             const chosenMap: Record<number, number> = {};
             pairList.forEach((pair) => {
-                const [idStr, valueStr] = pair.split("_");
+                const [idStr, prefStr] = pair.split("_");
                 const id = parseInt(idStr);
-                const value = parseInt(valueStr);
+                const value = parseInt(prefStr);
                 if (!isNaN(id)) {
                     chosenMap[id] = !isNaN(value) ? value : 0;
                 }
             });
 
-            // Get current lecturer ID
+            // get lecturer ID
             const lecturerID = lecturerData?.lecturerProfile?.lecturerId;
             if (lecturerID === undefined) {
                 console.warn("Lecturer ID missing");
                 return app;
             }
 
-            // Update preference
+            // update preference
             chosenMap[lecturerID] = newPreference;
 
-            // Rebuild chosenBy string
-            const newChosenByStr = Object.entries(chosenMap)
-                .map(([id, val]) => `${id}_${val}`)
-                .join(",");
+            // remake chosenBy string
+            const newChosenByStr = Object.entries(chosenMap).map(([id, val]) => `${id}_${val}`).join(",");
 
-            // Return updated application
+            // return updated application
             return {
                 ...app,
                 chosenBy: newChosenByStr,
@@ -194,7 +197,7 @@ const[lecturerData, setLecturerData] = useState<LecturerData>({
 
         setChosenCandidates(updatedData);
 
-        // Sync updated application with backend
+        // update the new preference to the database
         try {
             const updatedApp = updatedData.find(app => app.applicationId === applicationId);
             if (updatedApp) {
@@ -205,30 +208,31 @@ const[lecturerData, setLecturerData] = useState<LecturerData>({
         }
     };
 
+    // run those 2 functions when first load the page
     useEffect(() => {
         fetchChosen()
         loadComments()
     }, []);
 
     const sortedCandidates = useMemo(() => {
-        if (!lecturerData?.lecturerProfile?.lecturerId) return [];
+        if (!lecturerData?.lecturerProfile?.lecturerId) return []; //stops if no lecturerID
 
         const lecturerID = lecturerData.lecturerProfile.lecturerId;
 
+        //break down chosenBy to get the chosen candidates with preferences 
         const getLecturerPreference = (candidate: Applicant): [number, number] => {
             const chosenBy = candidate.chosenBy || "";
-            const match = chosenBy
-            .split(",")
-            .find((pair) => {
+            const match = chosenBy.split(",").find((pair) => {
                 const [idStr] = pair.split("_");
                 return parseInt(idStr) === lecturerID;
             });
 
-            if (!match) return [0, 0]; // no entry → sort first
+            if (!match) return [0, 0]; // if they dont have a preference (preference 0) then put first 
             const pref = parseInt(match.split("_")[1]);
-            return [1, isNaN(pref) ? Infinity : pref]; // has entry → sort by pref
+            return [1, isNaN(pref) ? Infinity : pref]; 
         };
-
+        
+        // sort by preference (low number to high number or high preference to low preference)
         return [...chosenCandidates].sort((a, b) => {
             const [aHas, aPref] = getLecturerPreference(a);
             const [bHas, bPref] = getLecturerPreference(b);
@@ -253,11 +257,11 @@ const[lecturerData, setLecturerData] = useState<LecturerData>({
                                         (() => {
                                         const pair = (candidate.chosenBy || "").split(",").find(p => parseInt(p.split("_")[0]) === lecturerData.lecturerProfile?.lecturerId);
                                         const pref = pair ? parseInt(pair.split("_")[1]) : 0;
-                                        return pref === 0 ? "" : pref; // Show empty string (--) if pref is 0
+                                        return pref === 0 ? "" : pref; // show empty string (--) if pref is 0
                                         })()
                                     }
                                     onChange={(e) => {
-                                        // Convert empty string (--) back to 0 when updating preference
+                                        // convert empty string (--) back to 0 when updating preference
                                         const val = e.target.value === "" ? 0 : parseInt(e.target.value);
                                         handlePreference(candidate.applicationId, val);
                                     }}

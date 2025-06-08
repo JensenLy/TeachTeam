@@ -36,6 +36,7 @@ export interface Application {
   role: "Tutor" | "Lab Assistance"
 }
 
+// User SECTION  
 export const userApi = {
   getAllUsers: async () => {
     const response = await api.get("/users");
@@ -75,6 +76,7 @@ export const userApi = {
     },
   };
 
+// Candidate SECTION  
 export const candidateApi = {
   getAllCandidate: async () => {
     const response = await api.get("/candidate");
@@ -87,6 +89,7 @@ export const candidateApi = {
   },
 };
 
+// Course SECTION  
 export const courseApi = {
   getAllCourses: async () => {
     const response = await api.get("/courses");
@@ -99,6 +102,7 @@ export const courseApi = {
   },
 };
 
+// Application SECTION  
 export const applicationApi = {
   getAllApps: async () => {
     const response = await api.get("/apps");
@@ -126,7 +130,7 @@ export const applicationApi = {
   }
 };
 
-
+// Comment SECTION  
 export const commentApi = {
   getAllComments: async () => {
     const response = await api.get("/comments");

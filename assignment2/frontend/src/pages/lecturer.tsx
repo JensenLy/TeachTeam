@@ -20,16 +20,20 @@ export default function Lecturer() {
 
   const fetchApplications = async () => {
     try {
+      // get all applications 
       const data = await applicationApi.getAllApps();
+
+      // get the list of lecturer's assigned courses by email in localstorage
       const email = localStorage.getItem("emailLoggedIn") || "";
       const lecturer = await userApi.getUserByEmail(email);
       const coursesAssigned = lecturer.lecturerProfile?.coursesAssigned;
-      const coursesAssignedArr = coursesAssigned ? coursesAssigned.split(",") : [];
+      const coursesAssignedArr = coursesAssigned ? coursesAssigned.split(",") : []; //split the string into an array of courseId (details in README) 
 
       const filteredApplications: Applicant[] = [];
 
+      // filter applications based on lecturer's assigned course  
       data.forEach((app: ApplicationData) => {
-        if (coursesAssignedArr.includes(app.courses?.courseId?.toString())) {
+        if (coursesAssignedArr.includes(app.courses?.courseId?.toString())) { //check if the current applications is in the assigned courses
           const appli: Applicant = {
             firstName: app.candidate?.user?.firstName,
             lastName: app.candidate?.user?.lastName,
@@ -45,20 +49,47 @@ export default function Lecturer() {
             chosenBy: app.chosenBy,
             role: app.role
           };
-          filteredApplications.push(appli);
+          // add current application to filteredApplications
+          filteredApplications.push(appli); 
         } else {
           console.log("No course found");
         }
       });
 
-      // Single state update, replaces all previous data
-      setApplicationData(filteredApplications);
+      // save filtered applications
+      setApplicationData(filteredApplications); 
 
     } catch (err) {
       console.log(err);
-      console.log("Failed to fetch applications 0");
+      console.log("Failed to fetch applications");
     }
   };
+
+  const initChosen = async () => {
+      if (applicationData.length === 0) return; //stops if applicationData is empty
+
+      try {
+        //get and set lecturerID 
+        const email = localStorage.getItem("emailLoggedIn") || "";
+        const userData = await userApi.getUserByEmail(email);
+        setUserID(userData.lecturerProfile?.lecturerId);
+
+        //initialise chosenStatus
+        const chosenStatus: { [index: number]: boolean } = {};
+        
+        //loop through applicationData and read ChosenBy and find which application is chosen by the current lecturer
+        applicationData.forEach((app, index) => {
+          const chosenList = app.chosenBy ? app.chosenBy.split(",") : []; //split to break down the chosenBy string (more in README)
+          const idList = chosenList.map((pair) => parseInt(pair.split("_")[0])).filter((id) => !isNaN(id));
+          chosenStatus[index] = idList.includes(userData.lecturerProfile?.lecturerId ?? -1);
+        });
+
+        //save chosenCandidates
+        setChosenCandidates(chosenStatus); 
+      } catch (err) {
+        console.error("Failed to determine chosen candidates", err);
+      }
+    };
 
   // initialise 
   useEffect(() => {
@@ -67,31 +98,11 @@ export default function Lecturer() {
 
   }, []);
 
-  // creating chosen map
+  // initialise chosen map
   useEffect(() => {
-    const initChosen = async () => {
-      if (applicationData.length === 0) return;
-
-      try {
-        const email = localStorage.getItem("emailLoggedIn") || "";
-        const userData = await userApi.getUserByEmail(email);
-        setUserID(userData.lecturerProfile?.lecturerId);
-
-        const chosenStatus: { [index: number]: boolean } = {};
-
-        applicationData.forEach((app, index) => {
-          const chosenList = app.chosenBy ? app.chosenBy.split(",") : [];
-          const idList = chosenList.map((pair) => parseInt(pair.split("_")[0])).filter((id) => !isNaN(id));
-          chosenStatus[index] = idList.includes(userData.lecturerProfile?.lecturerId ?? -1);
-        });
-
-        setChosenCandidates(chosenStatus);
-      } catch (err) {
-        console.error("Failed to determine chosen candidates", err);
-      }
-    };
 
     initChosen();
+
 }, [applicationData]);
 
   //status in this means: "0 for not chosen", "1 for most chosen", "2 for least chosen", "3 for others"
@@ -126,7 +137,7 @@ export default function Lecturer() {
   });
   zeroCount.forEach((app) => (app.status = 0)); // not chosen
 
-  //merge all categorised applicants into 1 array, in order from most chosen -> others -> least chosen -> not chosen
+  //merge all categorised applicants into 1 array, in order from most chosen -> others -> least chosen -> not chosen (highest to lowest)
   const orderedApplicants = [ 
     ...nonZero.filter((app) => app.status === 1),
     ...nonZero.filter((app) => app.status === 3),
@@ -134,7 +145,8 @@ export default function Lecturer() {
     ...zeroCount,
   ];
 
-  const chartData = orderedApplicants.map((app) => ({
+  // create chart 
+  const chartData = orderedApplicants.map((app) => ({ 
     name: `${app.firstName} ${app.lastName} (${app.courseName})`,
     votes: app.count
   }))
@@ -153,16 +165,17 @@ export default function Lecturer() {
   const handleChooseCandidate = async (index: number) => {
     const isSelected = !chosenCandidates[index]; // toggle status
 
-    // Clone state
+    // clone state
     const updated = { ...chosenCandidates, [index]: isSelected };
     const updatedData = [...applicationData];
     const app = updatedData[index];
     
-
+    // get the previous count and get/break down chosenBy column
     const oldCount = app.count || 0;
     const chosenListStr = app.chosenBy || "";
     const chosenMap: Record<number, number> = {}; 
 
+    // convert chosenBy into chosenMap
     chosenListStr.split(",").forEach((pair) => {
       const [idStr, prefStr] = pair.split("_");
       const id = parseInt(idStr);
@@ -174,7 +187,7 @@ export default function Lecturer() {
 
     });
 
-    // Add or remove current userID from map
+    // add or remove current userID(lecturerId) from map
     if (isSelected) {
 
       if (!(userID in chosenMap)) {
@@ -185,12 +198,12 @@ export default function Lecturer() {
       delete chosenMap[userID];
     }
 
-    // Rebuild the chosenBy string
+    // turn chosenMap into the chosenBy string again
     const newChosenListStr = Object.entries(chosenMap)
       .map(([id, pref]) => `${id}_${pref}`)
       .join(",");
 
-    // Update frontend state
+    // update frontend state
     updatedData[index] = {
       ...app,
       count: isSelected ? oldCount + 1 : Math.max(0, oldCount - 1),
@@ -199,13 +212,13 @@ export default function Lecturer() {
     setApplicationData(updatedData);
     setChosenCandidates(updated);
 
-    // Sync with backend
+    // update the database
     try {
       await applicationApi.updateCount(app.applicationId, updatedData[index].count, newChosenListStr);
     } catch (err) {
       console.error("Failed to update backend:", err);
     }
-};
+  };
 
   return (
     <div className="min-h-screen">

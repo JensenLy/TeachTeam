@@ -6,7 +6,6 @@
     import { useContext } from "react";
     import { LoginContext, LoginContextType } from "@/contexts/LoginContext";
     import { userApi } from "../services/api";
-    // a list of users which are 3 tutors and 3 lecturers
 
     export default function SignIn(){
     const[email, setEmail] = useState<string>("")
@@ -28,7 +27,7 @@
             setUser(data);
             return data;
         } catch (err) {
-            setUser({firstName: "", lastName: "", email: "", password:"", role: ""})
+            setUser({firstName: "", lastName: "", email: "", password:"", role: ""}) //set to default value if fetch fails
             console.log(err)
         }
     };
@@ -48,11 +47,13 @@
             return;
         }
         
+        // check if the email exists 
         if(!foundUser || !foundUser.email){
             setLoginMessage("Email not found ❌");
             return;
         }
         
+        // verify password
         const isValidPassword = await userApi.verifyPassword(email, password);
 
         if(isValidPassword){

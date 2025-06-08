@@ -54,7 +54,7 @@ export default function Tutor() {
     // swap (or switch or whatever) between the jobs card and the form 
     const swapScreen = (e: React.MouseEvent<HTMLButtonElement>, index?: number) => {    
         e.preventDefault(); //same as above, prevent refreshing 
-        if(typeof index !== "undefined"){ //set the program code for the form if there's none 
+        if(typeof index !== "undefined"){ //set the program code for the form if there's one 
             setCourse(courses[index])
         }
         setScreenState(!screenState); //swap back and forth between screens (false is the job cards, true is the form)
@@ -62,12 +62,12 @@ export default function Tutor() {
 
     const createApplication = async () => {
         try {
+            //get candidate id by email in localstorage 
             const user = await userApi.getUserByEmail(context.emailLoggedIn);
-
             const candidate = await candidateApi.getCandidateByUserID(user);
-
             const candidateId = candidate.id;
 
+            //check if the candidate is already applied for the course 
             const alreadyApplied = await applicationApi.hasApplied(candidateId, course.courseId)
             
             if(alreadyApplied){
@@ -75,18 +75,19 @@ export default function Tutor() {
                 return;
             }
 
+            //the data of application will be set here 
             const application: Application = {
-            candidateId,
-            courseId: course.courseId,
-            skills: skill,
-            academic: academic,
-            prevRoles: prevRoles,
-            availability: userAvailability,
-            role: course.type as "Tutor" | "Lab Assistance",
+                candidateId,
+                courseId: course.courseId,
+                skills: skill,
+                academic: academic,
+                prevRoles: prevRoles,
+                availability: userAvailability,
+                role: course.type as "Tutor" | "Lab Assistance",
             };
 
             console.log(application)
-            await applicationApi.createApp(application);
+            await applicationApi.createApp(application); //add the application to the database 
         } catch (err) {
             console.log(err);
         }
