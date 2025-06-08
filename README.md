@@ -17,6 +17,9 @@ For chart to be working (if npm install does not install everything from package
 npm i @chakra-ui/react@2 @emotion/react @emotion/styled framer-motion
 npm install recharts
 
+to install jest use
+npm install --save-dev jest ts-jest @types/jest @testing-library/react @testing-library/jest-dom
+
 **[1]** 
 For assigning course to the lecturer, in coursesAssigned, use this format "courseId,courseId,courseId" (for example "1,2,3"). Assigned course will be NULL in database upon creating a user-lecturer and there will be no application showing until assigned courses are set on the database. 
 
