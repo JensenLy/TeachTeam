@@ -41,7 +41,7 @@ export class Courses {
     // @JoinColumn({ name: "applicationsId" })
     applications: Applications[];
 
-    @ManyToMany(() => LecturerProfile, lecturer => lecturer.coursesAssigned)
+    @OneToMany(() => LecturerProfile, lecturer => lecturer.coursesAssigned)
     @JoinColumn({ name: "lecturerId" })
     lecturers: LecturerProfile[];
 }

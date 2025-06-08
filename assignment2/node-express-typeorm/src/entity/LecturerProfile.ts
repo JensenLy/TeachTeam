@@ -28,7 +28,7 @@ export class LecturerProfile {
     // @JoinColumn({ name: "commentId" })
     comments: Comment[];
 
-    @ManyToMany(() => Courses, course => course.lecturers)
+    @OneToMany(() => Courses, course => course.lecturers)
     @JoinColumn({ name: "courseId" })
     courses: Courses[];
 }
