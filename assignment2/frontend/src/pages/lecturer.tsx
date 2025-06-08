@@ -65,7 +65,17 @@ export default function Lecturer() {
     }
   };
 
-  const initChosen = async () => {
+  
+  // initialise 
+  useEffect(() => {
+
+    fetchApplications();
+
+  }, []);
+
+  // initialise chosen map
+  useEffect(() => {
+    const initChosen = async () => {
       if (applicationData.length === 0) return; //stops if applicationData is empty
 
       try {
@@ -90,16 +100,6 @@ export default function Lecturer() {
         console.error("Failed to determine chosen candidates", err);
       }
     };
-
-  // initialise 
-  useEffect(() => {
-
-    fetchApplications();
-
-  }, []);
-
-  // initialise chosen map
-  useEffect(() => {
 
     initChosen();
 
