@@ -12,7 +12,6 @@ import {
 
 import argon2 from "argon2";
 import { LecturerProfile } from "./LecturerProfile";
-import { CandidateProfile } from "./CandidateProfile";
 
 @Entity()
 export class User {
