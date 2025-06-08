@@ -146,9 +146,9 @@ const[lecturerData, setLecturerData] = useState<LecturerData>({
 
             if (!commentMap[appId]) commentMap[appId] = [];
 
-            // merge the commenter name, content, comment date and comment id into one string with delimiter
+            // merge the commenter name, content, comment date, comment id and lecturerId into one string with delimiter
             const commenter = `${cmt.lecturer?.user?.firstName} ${cmt.lecturer?.user?.lastName}`;
-            commentMap[appId].push(`${commenter}/|theBestDelimiter/|${cmt.content}/|theBestDelimiter/|${cmt.createdAt}/|theBestDelimiter/|${cmt.id}`);
+            commentMap[appId].push(`${commenter}/|theBestDelimiter/|${cmt.content}/|theBestDelimiter/|${cmt.createdAt}/|theBestDelimiter/|${cmt.id}/|theBestDelimiter/|${cmt.lecturer?.lecturerId}`);
         });
 
         setSentComment(commentMap);
@@ -312,9 +312,14 @@ const[lecturerData, setLecturerData] = useState<LecturerData>({
                                                 </div>
                                                 <div className='flex'>
                                                     <h3><strong>Posted at: </strong>{comment.split("/|theBestDelimiter/|")[2]}</h3> 
-                                                    <button onClick={() => deleteComment(comment.split("/|theBestDelimiter/|")[3])} className='bg-red-500 hover:bg-red-700 !px-4 !py-0 !ml-1'>
-                                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
-                                                    </button>
+
+                                                    {/*check the lecturer id from the comment and the current lecturer id to allow comment deletion*/}
+                                                    {comment.split("/|theBestDelimiter/|")[4] === String(lecturerData.lecturerProfile?.lecturerId) && (
+                                                        <button onClick={() => deleteComment(comment.split("/|theBestDelimiter/|")[3])} className='bg-red-500 hover:bg-red-700 !px-4 !py-0 !ml-1'>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
+                                                        </button>
+                                                    )}
+
                                                 </div>
                                             </div>         
                                             {/*the name should be at the second index after split (unless someone accidently commented /|theBestDelimiter/|) */}
