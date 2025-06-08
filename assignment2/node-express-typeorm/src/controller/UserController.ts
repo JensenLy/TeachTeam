@@ -75,7 +75,7 @@ export class UserController {
 
         const savedProfile = await this.candidateRepository.save(candidateProfile)
 
-        savedUser.candidateProfile = savedProfile
+        // savedUser.candidateProfile = savedProfile
         await this.userRepository.save(savedUser)
       }
 

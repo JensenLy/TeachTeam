@@ -18,7 +18,11 @@ export class CandidateProfile {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToOne(() => User, user => user.candidateProfile)
+    // @OneToOne(() => User, user => user.candidateProfile)
+    // @JoinColumn({ name: "userId" })
+    // user: User;
+
+    @OneToOne(() => User, { onDelete: "CASCADE" })
     @JoinColumn({ name: "userId" })
     user: User;
 

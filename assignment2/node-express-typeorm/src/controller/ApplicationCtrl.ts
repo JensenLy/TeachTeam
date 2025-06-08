@@ -43,6 +43,18 @@ export class ApplicationCtrl {
           if (!candidate || !course) {
             return response.status(400).json({ message: "Invalid candidate or course ID" });
           }
+
+          const checkExisitngApp = await this.AppRepository.findOne({
+            where:{
+              candidate: {id: candidateId},
+              courses: {courseId},
+              },
+              relations: ["candidate", "courses"],
+          });
+
+          if(checkExisitngApp){
+            return response.status(400).json({ message: "You have already applied for this course" }); 
+          }
         
           const app = new Applications();
           app.chosenBy;
