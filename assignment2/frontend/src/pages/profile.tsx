@@ -1,7 +1,7 @@
 import React from "react";
 import { LoginContext, LoginContextType } from "@/contexts/LoginContext";
 import { useState, useEffect } from "react";
-import { userApi, User } from "../services/api";
+import { userApi, User, courseApi } from "../services/api";
 import Header from "@/components/header";
 
 export default function Profile() {
@@ -11,7 +11,8 @@ export default function Profile() {
     const [user, setUser] = useState<Partial<User>>({}); 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
+    const [courseTitles, setCourseTitles] = useState<string[]>([]);
+    
     // get user details every time the email is changed in localstorage 
     useEffect(() => {
         const fetchUser = async () => {
@@ -28,7 +29,32 @@ export default function Profile() {
                 setLoading(false)
             }
         }
+
+        const getCourses = async () => {
+            try {
+                //get the list of id of assigned course
+                const data = await userApi.getUserByEmail(emailLoggedIn);
+                const courseIdStr = data.lecturerProfile?.coursesAssigned;
+
+                if (courseIdStr) {
+                    const courseIdArr: string[] = courseIdStr.split(","); //break down it into an array of string 
+
+                    // get courses with id in courseIdArr
+                    const courseObjs = await Promise.all(
+                        courseIdArr.map(id => courseApi.getCoursesByID(parseInt(id)))
+                    );
+
+                    // get course titles
+                    const courseTitleArr: string[] = courseObjs.map(course => course.title + " - " + course.type);
+                    setCourseTitles(courseTitleArr);
+                }
+            } catch (err) {
+                console.error("Failed to fetch course titles:", err);
+            }
+        };
+
         fetchUser(); // get user details 
+        getCourses();
     }, [emailLoggedIn]);
 
     const handleUpdateUser = async (e: React.FormEvent) => {
@@ -57,6 +83,7 @@ export default function Profile() {
 
     // save the new data to the state which will be used in handleUpdateUser
     const startEditing = (user: User) => {
+        console.log(courseTitles)
         setEditingUserId(user.id);
         setEditUser({
             firstName: user.firstName,
@@ -130,14 +157,27 @@ export default function Profile() {
                     ) : (
                         <div className="flex justify-between items-center">
                             <div>
-                                <h3 className="font-semibold">
-                                    {user.firstName} {user.lastName}
-                                </h3>
+                                <h3 className="font-semibold text-[2rem]"><strong>{user.firstName} {user.lastName}</strong></h3>
                                 <p className="text-gray-600">{user.email}</p>
-                                <p className="text-gray-600">Role: {user.role}</p>
-                                <p className="text-gray-600">Created At: {user.createdAt ? new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : "N/A"}</p>
-                                <p className="text-gray-600">Last Updated: {user.updatedAt ? new Date(user.updatedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : "N/A"}</p>
+                                <p className="text-gray-600"><strong>Role: </strong>{user.role}</p>
+                                <p className="text-gray-600"><strong>Created At: </strong>{user.createdAt ? new Date(user.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : "N/A"}</p>
+                                <p className="text-gray-600"><strong>Last Updated: </strong>{user.updatedAt ? new Date(user.updatedAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : "N/A"}</p>
+                                {user.role === "lecturer" && (
+                                    <div className="mt-4">
+                                        <h4 className="font-semibold">Assigned Courses</h4>
+                                        {courseTitles.length > 0 ? (
+                                            <ul className="list-disc pl-5 text-gray-700">
+                                                {courseTitles.map((title, idx) => (
+                                                    <li key={idx}>{title}</li>
+                                                ))}
+                                            </ul>
+                                        ) : (
+                                            <p className="text-gray-600 italic">No assigned courses</p>
+                                        )}
+                                    </div>
+                                )}
                             </div>
+                            
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => startEditing(user as User)}
@@ -146,6 +186,8 @@ export default function Profile() {
                                     Edit
                                 </button>
                             </div>
+                            
+                            
                         </div>
                     )}
                 </div>

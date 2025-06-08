@@ -8,7 +8,7 @@ router.get("/courses", async (req, res) => {
   await courses.all(req, res);
 });
 
-router.get("/users/:id", async (req, res) => {
+router.get("/courses/:id", async (req, res) => {
   await courses.one(req, res);
 });
 export default router;
