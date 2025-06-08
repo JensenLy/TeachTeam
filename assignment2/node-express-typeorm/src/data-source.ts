@@ -6,14 +6,17 @@ import { Courses } from "./entity/Courses";
 import { Comment } from "./entity/Comment";
 import { CandidateProfile } from "./entity/CandidateProfile";
 import { LecturerProfile } from "./entity/LecturerProfile";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 export const AppDataSource = new DataSource({
-  type: "mysql",
-  host: "209.38.26.237",
-  port: 3306,
-  username: "S3977367",
-  password: "S3977367",
-  database: "S3977367",
+  type: process.env.DB_DIALECT as any,
+  host: process.env.DB_HOST,
+  port: parseInt(process.env.DB_PORT || "3306", 10),
+  username: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
   // synchronize: true will automatically create database tables based on entity definitions
   // and update them when entity definitions change. This is useful during development
   // but should be disabled in production to prevent accidental data loss.
