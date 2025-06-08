@@ -33,6 +33,8 @@ For the "chosenBy" column in "applications" table, the format will be "lecturerI
 The 2 points above is why you will come across quite a few .split(",") and .split("_") in the frontend since we break these string down to get the data we want. 
 
 The ER diagram was put under assignment2/node-express-typeorm/ER-diagram.png
+
+
 **REFERENCE**
 1. The structure of **authContext** was used to create the LoginContext from week 4 lab code.
 2. The graphing library used for **Visual Reprensetation** Distinction part is from recharts.
@@ -42,3 +44,14 @@ Link: https://www.npmjs.com/package/supertest
 4. The structure of backend and api (including routes, entities, controllers, server.ts, data-sources.ts, app.ts,) was based on week 8 workshop/lab code. 
 5. The regex for password validation from signup.tsx and signin.tsx was based on week 4 workshop/lab code.
 6. In both signup.tsx and signin.tsx, onBlur() was found on GeeksforGeeks (https://www.geeksforgeeks.org/reactjs/react-onblur-event/) when finding for a deviant of onChange(). 
+
+
+**database access details**
+DB_HOST=209.38.26.237
+DB_PORT=3306
+DB_USER=S3977367
+DB_PASS=S3977367
+DB_NAME=S3977367
+DB_DIALECT=mysql
+
+
