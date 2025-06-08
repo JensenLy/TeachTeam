@@ -1,8 +1,9 @@
 import { AppDataSource } from "src/data-source";
-import { User } from "../entity/User"
-import { CandidateProfile } from "src/entity/CandidateProfile";
 import app from "src/app";
 import { Applications } from "src/entity/Applications";
+import { Courses } from "src/entity/Courses";
+import { CandidateProfile } from "src/entity/CandidateProfile";
+import { User } from "src/entity/User";
 const request = require("supertest")
 
 // before testing connect to the database 
@@ -10,13 +11,16 @@ beforeAll(async () => {
     await AppDataSource.initialize();
 });
 
+afterAll(async () => {
+    await AppDataSource.destroy();
+});
 
 /* The test creates a new user and course, then the user applies to that course twice.
 The first application being a success but the second one fails because no user can apply
 for the same course twice. */
 
 describe("prevent duplicate application to the same course", () => {
-    
+
     let userId: number;
     let candidateId: number;
     let courseId: number;
@@ -31,9 +35,9 @@ describe("prevent duplicate application to the same course", () => {
             password: "John12345@",
             role: "candidate",
         });
-        
+
         userId = user.body.userId;
-        
+
         const candidate = await request(app).post("/api/candidates").send({
             userId,
         });
@@ -78,12 +82,4 @@ describe("prevent duplicate application to the same course", () => {
         expect(secondApplication.status).toBe(400);
         expect(secondApplication.body.message).toBe("You have already applied for this course");
     });
-    afterAll(async () => {
-    if (applicationId) await request(app).delete(`/api/apps/${applicationId}`);
-    if (candidateId) await request(app).delete(`/api/candidates/${candidateId}`);
-    if (courseId) await request(app).delete(`/api/courses/${courseId}`);
-    if (userId) await request(app).delete(`/api/users/${userId}`);
-
-    await AppDataSource.destroy();
-});
 });
