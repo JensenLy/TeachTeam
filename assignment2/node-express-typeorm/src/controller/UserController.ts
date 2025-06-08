@@ -15,18 +15,20 @@ export class UserController {
    * @param response - Express response object
    * @returns JSON response containing an array of all users
    */
-  async all(request: Request, response: Response) {
+  //get all users 
+  async all(request: Request, response: Response) { 
     const users = await this.userRepository.find();
 
     return response.json(users);
   }
 
   /**
-   * Retrieves a single user by their ID
+   * Retrieves a single user by their Email
    * @param request - Express request object containing the user ID in params
    * @param response - Express response object
    * @returns JSON response containing the user if found, or 404 error if not found
    */
+  //get one user by email with lecturerProfile 
   async one(request: Request, response: Response) {
     const email = request.params.email;
     const user = await this.userRepository.findOne({
@@ -46,10 +48,11 @@ export class UserController {
    * @param response - Express response object
    * @returns JSON response containing the created user or error message
    */
+  //add a user onto the database 
   async save(request: Request, response: Response) {
-    const { firstName, lastName, email, password, role } = request.body;
+    const { firstName, lastName, email, password, role } = request.body; //get these fields from the frontend 
 
-    const user = Object.assign(new User(), {
+    const user = Object.assign(new User(), { //assign to an User Object
       firstName,
       lastName,
       email,
@@ -58,13 +61,13 @@ export class UserController {
     });
 
     try {
-      const savedUser = await this.userRepository.save(user);
+      const savedUser = await this.userRepository.save(user); //add the user data to user table first 
 
       if(user.role === "lecturer") {
         const lecturerProfile = new LecturerProfile();
         lecturerProfile.user = savedUser; // Associate the user with the lecturer profile
 
-        const savedProfile = await this.lecturerRepository.save(lecturerProfile);
+        const savedProfile = await this.lecturerRepository.save(lecturerProfile); 
 
         savedUser.lecturerProfile = savedProfile; 
         await this.userRepository.save(savedUser);
@@ -86,16 +89,16 @@ export class UserController {
   }
 
   async verifyPassword(request: Request, response: Response) {
-    const { email, password } = request.body;
+    const { email, password } = request.body; //get email and password from the api/frontend 
 
     try{
-      const user = await this.userRepository.findOne({ where: { email } });
+      const user = await this.userRepository.findOne({ where: { email } }); //find the user with that email 
 
       if (!user) {
         return response.status(404).json({ message: "User not found" });
       }
 
-      const isValidPassword = await argon2.verify(user.password, password);
+      const isValidPassword = await argon2.verify(user.password, password); //then verify user's password using argon2 
 
       if(!isValidPassword) {
         return response.status(401).json({ message: "Invalid password" });
@@ -133,10 +136,10 @@ export class UserController {
    * @returns JSON response containing the updated user or error message
    */
   async update(request: Request, response: Response) {
-    const id = parseInt(request.params.id);
-    const { firstName, lastName, email, age } = request.body;
+    const id = parseInt(request.params.id); //get id of the user to be edited 
+    const { firstName, lastName, email, age } = request.body; //get new data from the api/frontend 
 
-    let userToUpdate = await this.userRepository.findOne({
+    let userToUpdate = await this.userRepository.findOne({ //find user with id 
       where: { id },
     });
 
@@ -144,7 +147,7 @@ export class UserController {
       return response.status(404).json({ message: "User not found" });
     }
 
-    userToUpdate = Object.assign(userToUpdate, {
+    userToUpdate = Object.assign(userToUpdate, { //assign new data to the new object 
       firstName,
       lastName,
       email,
@@ -152,7 +155,7 @@ export class UserController {
     });
 
     try {
-      const updatedUser = await this.userRepository.save(userToUpdate);
+      const updatedUser = await this.userRepository.save(userToUpdate); //save the new object to the database 
       return response.json(updatedUser);
     } catch (error) {
       return response.status(400).json({ message: "Error updating user", error });

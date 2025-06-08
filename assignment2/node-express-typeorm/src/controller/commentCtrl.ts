@@ -1,15 +1,12 @@
 import { Request, Response } from "express";
 import { AppDataSource } from "../data-source";
 import { Comment } from "../entity/Comment";
-import { LecturerProfile } from "../entity/LecturerProfile";
-import { Applications } from "../entity/Applications";
 
 export class commentCtrl {
     
-    private AppRepository = AppDataSource.getRepository(Applications);
     private CommentRepo = AppDataSource.getRepository(Comment);
-    private LecturerRepo = AppDataSource.getRepository(LecturerProfile);
 
+    //get all comments with everything related 
     async all(request: Request, response: Response) {
         const comments = await this.CommentRepo.find({
         relations: ["application", "lecturer", "lecturer.user"],
@@ -19,9 +16,10 @@ export class commentCtrl {
         return response.json(comments);
     }
 
+    //add new comment onto the database
     async save(request: Request, response: Response) {
 
-      const {content, applicationId, lecturerId} = request.body;
+      const {content, applicationId, lecturerId} = request.body; //get new data from the api/frontend 
   
       try {
           const cmt = new Comment();
@@ -38,6 +36,7 @@ export class commentCtrl {
         }
     }
 
+    //delete a comment by looking for its id 
     async remove(request: Request, response: Response) {
       const id = parseInt(request.params.id);
       const cmtToRemove = await this.CommentRepo.findOne({
