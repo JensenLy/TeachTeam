@@ -27,6 +27,7 @@ For the "chosenBy" column in "applications" table, the format will be "lecturerI
 
 The 2 points above is why you will come across quite a few .split(",") and .split("_") in the frontend since we break these string down to get the data we want. 
 
+The ER diagram was put under assignment2/node-express-typeorm/ER-diagram.png
 **REFERENCE**
 1. The structure of **authContext** was used to create the LoginContext from week 4 lab code.
 2. The graphing library used for **Visual Reprensetation** Distinction part is from recharts.
