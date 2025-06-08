@@ -12,10 +12,11 @@ export default function Profile() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-
+    // get user details every time the email is changed in localstorage 
     useEffect(() => {
         const fetchUser = async () => {
             try {
+                // find user by email  
                 const data = await userApi.getUserByEmail(emailLoggedIn);
                 setUser(data);
                 console.log("Fetched user:", data);
@@ -33,17 +34,18 @@ export default function Profile() {
     const handleUpdateUser = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!editingUserId) return;
+        if (!editingUserId) return; //return if the currently editing userId does not exist 
 
         try {
-            await userApi.updateUser(editingUserId, editUser);
+            await userApi.updateUser(editingUserId, editUser); //find user by id and then update base on editUser
             
-            if(editUser.email && (editUser.email !== emailLoggedIn)){
-                setEmailLoggedIn(editUser.email);
+            if(editUser.email && (editUser.email !== emailLoggedIn)){ //get the email from editUser or get it from localstorage if fails  
+                setEmailLoggedIn(editUser.email); //set the email on localstorage 
             }
             
-            const updateUser = await userApi.getUserByEmail(editUser.email || emailLoggedIn)
+            const updateUser = await userApi.getUserByEmail(editUser.email || emailLoggedIn) //get user from database
 
+            // set the current state to the newly updated data 
             setUser(updateUser)
             setEditingUserId(null);
             setEditUser({});
@@ -53,6 +55,7 @@ export default function Profile() {
         }
     };
 
+    // save the new data to the state which will be used in handleUpdateUser
     const startEditing = (user: User) => {
         setEditingUserId(user.id);
         setEditUser({
@@ -62,6 +65,7 @@ export default function Profile() {
         });
     };
 
+    //loading and error screen 
     if (loading) return <div className="flex justify-center items-center">Loading...</div>
     if (error) return <div className="lex justify-center items-center text-red-500">{error}</div>
 

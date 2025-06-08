@@ -20,7 +20,8 @@ const [newUser, setNewUser] = useState({
 
 const handleFindUser = async (email:string) => {
   try {
-      await userApi.getUserByEmail(email);
+      //find user from the database by email to check if the email is already existed 
+      await userApi.getUserByEmail(email); 
       setError("Email existed ❌")
   } catch (err) {
       console.log(err);
@@ -42,10 +43,6 @@ const handlePassword = (password:string) => {
 const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if(userRole === "lecturer"){
-     } 
-    else{
-     }
     if (newUser.password !== confirmPassword) {
       alert("Passwords do not match. Please try again.");
       return;
@@ -58,7 +55,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 
 const handleCreateUser = async () => {
     try {
-      await userApi.createUser(newUser);
+      await userApi.createUser(newUser); //add new user to the database 
     } catch (err) {
       console.log("Failed to add user");
       console.log(err);
@@ -117,7 +114,7 @@ else{
             placeholder='example@email.com' 
             pattern="/^[a-zA-Z0-9.!#$%&'+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)$/" 
             onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-            onBlur={(e) => handleFindUser(e.target.value)}
+            onBlur={(e) => handleFindUser(e.target.value)} //check email when unfocus 
             required></input>
 
             {error && (
@@ -131,7 +128,7 @@ else{
             name="createPassword" 
             minLength={8}
             onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-            onBlur={(e) => handlePassword(e.target.value)}
+            onBlur={(e) => handlePassword(e.target.value)} //check password when unfocus 
             required></input>
 
             {signUpMessage && (
