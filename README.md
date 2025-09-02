@@ -1,5 +1,5 @@
-# TeachTeam, a platform for lecturers and tutors (ReactTS, Node/Express, TypeORM)
-Full Stack Development Assignment (React TS + Node/Express + Cloud MySQL)
+# TeachTeam, a platform for lecturers and tutors
+Full Stack Development Assignment (ReactTS + Node/Express + Cloud MySQL + TypeORM)
 
 **Contributors:**  
 Christian Nabati and Kien Hung (Jensen) Ly
